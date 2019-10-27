@@ -129,8 +129,8 @@ int test_count = 0;
 	TH2D* h_chi2min_mass_el = new TH2D("h_chi2min_mass_el","",50,0.,500.,40,0.,200.);
 		
 
-	int bins_No1 = 50;
-	double hist_min1 = 0.;
+	int bins_No1 = 100;
+	double hist_min1 = -1.;
 	double hist_max1 = 1.;
 	string x_axis_name = "";
 	string histogram_cons = " ;" + x_axis_name + ";Events(No.)";
