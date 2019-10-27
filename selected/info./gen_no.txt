@@ -1,0 +1,45 @@
+
+
+/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_001/bpk_ntuple_*.root : 28143936
+/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_002/bpk_ntuple_*.root : 28195200
+/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_003/bpk_ntuple_*.root : 20018717
+
+
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 7145468
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 5093947
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 1265157
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 8292957
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 2668730
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 596079
+/wk_cms2/yichen/bpk_ntuple/DYJetsToLL_M-50_HT/BPK_80X_DYJetsToLL_M-50_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 399492
+
+/wk_cms2/yichen/bpk_ntuple/VV/BPK_80X_WW_TuneCUETP8M1_13TeV-pythia8/bpk_ntuple_*.root : 994012
+/wk_cms2/yichen/bpk_ntuple/VV/BPK_80X_WZ_TuneCUETP8M1_13TeV-pythia8/bpk_ntuple_*.root : 1000000
+/wk_cms2/yichen/bpk_ntuple/VV/BPK_80X_ZZ_TuneCUETP8M1_13TeV-pythia8/bpk_ntuple_*.root : 843120
+
+/wk_cms2/yichen/bpk_ntuple/SingleTop/BPK_80X_ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/bpk_ntuple_*.root : 1000000
+/wk_cms2/yichen/bpk_ntuple/SingleTop/BPK_80X_ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/bpk_ntuple_*.root : 38780433
+/wk_cms2/yichen/bpk_ntuple/SingleTop/BPK_80X_ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/bpk_ntuple_*.root : 66437948
+/wk_cms2/yichen/bpk_ntuple/SingleTop/BPK_80X_ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/bpk_ntuple_*.root : 6710218
+/wk_cms2/yichen/bpk_ntuple/SingleTop/BPK_80X_ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/bpk_ntuple_*.root : 6924540
+
+
+
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 10210158
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 13804318
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 1963464
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 12420040
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 6200954
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 244532
+/wk_cms2/sam7k9621/WJetsToLNu_HT/BPK_80X_WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 253561
+
+
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 80365476
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 38857977
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 37502012
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 42190760
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 15629253
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 4767100
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 7855883
+/wk_cms2/sam7k9621/QCD/BPK_80X_QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/bpk_ntuple_*.root : 3839969
+

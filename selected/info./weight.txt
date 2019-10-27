@@ -1,0 +1,176 @@
+#include <iostream>
+#include <vector>
+#include "stdlib.h"
+#include "stdio.h"
+#include <string.h>
+#include <cstring>
+#include <vector>
+//#include "Selected/selected/interface/weight.h"
+
+using namespace std;
+
+
+Data_SE.push_back(SE_2016B);
+Data_SE.push_back(SE_2016C);
+Data_SE.push_back(SE_2016D);
+Data_SE.push_back(SE_2016E);
+Data_SE.push_back(SE_2016F);
+Data_SE.push_back(SE_2016G);
+Data_SE.push_back(SE_2016H_v2);
+Data_SE.push_back(SE_2016H_v3);
+
+Data_SM.push_back(SM_2016B);
+Data_SM.push_back(SM_2016C);
+Data_SM.push_back(SM_2016D);
+Data_SM.push_back(SM_2016E);
+Data_SM.push_back(SM_2016F);
+Data_SM.push_back(SM_2016G);
+Data_SM.push_back(SM_2016H_v2);
+Data_SM.push_back(SM_2016H_v3);
+
+TT.push_back(pre_TT_001);
+TT.push_back(pre_TT_002);
+TT.push_back(pre_TT_003);
+
+DY.push_back(pre_DY_100_200);
+DY.push_back(pre_DY_200_400);
+DY.push_back(pre_DY_400_600);
+DY.push_back(pre_DY_600_800);
+DY.push_back(pre_DY_800_1200);
+DY.push_back(pre_DY_1200_2500);
+DY.push_back(pre_DY_2500_Inf);
+
+
+WJets.push_back(pre_Wjets_100_200);
+WJets.push_back(pre_Wjets_200_400);
+WJets.push_back(pre_Wjets_400_600);
+WJets.push_back(pre_Wjets_600_800);
+WJets.push_back(pre_Wjets_800_1200);
+WJets.push_back(pre_Wjets_1200_2500);
+WJets.push_back(pre_Wjets_2500_Inf);
+
+VV.push_back(pre_VV_WW);
+VV.push_back(pre_VV_WZ);
+VV.push_back(pre_VV_ZZ);
+
+ST.push_back(pre_ST_s);
+ST.push_back(pre_ST_t_antitop);
+ST.push_back(pre_ST_t_top;
+ST.push_back(pre_ST_tW_antitop);
+ST.push_back(pre_ST_tW_top);
+
+QCD.push_back(pre_QCD_100_200);
+QCD.push_back(pre_QCD_200_300);
+QCD.push_back(pre_QCD_300_500);
+QCD.push_back(pre_QCD_500_700);
+QCD.push_back(pre_QCD_700_1000);
+QCD.push_back(pre_QCD_1000_1500);
+QCD.push_back(pre_QCD_1500_2000);
+QCD.push_back(pre_QCD_2000_Inf);
+
+gen_no_TT.push_back(28143936);
+gen_no_TT.push_back(28195200);
+gen_no_TT.push_back(20018717);
+
+gen_no_DY.puch_back(7145468);
+gen_no_DY.puch_back(5093947);
+gen_no_DY.puch_back(1265157);
+gen_no_DY.puch_back(8292957);
+gen_no_DY.puch_back(2668730);
+gen_no_DY.puch_back(596079);
+gen_no_DY.puch_back(399492);
+
+gen_no_VV.push_back(994012);
+gen_no_VV.push_back(1000000);
+gen_no_VV.push_back(843120);
+
+gen_no_ST.push_back(1000000);
+gen_no_ST.push_back(38780433);
+gen_no_ST.push_back(66437948);
+gen_no_ST.push_back(6710218);
+gen_no_ST.push_back(6924540);
+
+gen_no_WJets.push_back(10210158);
+gen_no_WJets.push_back(13804318);
+gen_no_WJets.push_back(1963464);
+gen_no_WJets.push_back(12420040);
+gen_no_WJets.push_back(6200954);
+gen_no_WJets.push_back(244532);
+gen_no_WJets.push_back(253561);
+
+gen_no_QCD.push_back(80365476);
+gen_no_QCD.push_back(38857977);
+gen_no_QCD.push_back(37502012);
+gen_no_QCD.push_back(42190760);
+gen_no_QCD.push_back(15629253);
+gen_no_QCD.push_back(4767100);
+gen_no_QCD.push_back(7855883);
+gen_no_QCD.push_back(3839969);
+
+Xs_TT.assign(3,831.76);
+
+//Xs_DY.push_back(169.9*1.23);	//70-100
+Xs_DY.push_back(147.4*1.23);	//100-200
+Xs_DY.push_back(40.99*1.23);	//200-400
+Xs_DY.push_back(5.678*1.23);	//400-600
+Xs_DY.push_back(1.367*1.23);	//600-800
+Xs_DY.push_back(0.6304*1.23);	//800-1200
+Xs_DY.push_back(0.1514*1.23);	//1200-2500
+Xs_DY.push_back(0.003565*1.23);	//2500-Inf
+
+Xs_WJets.push_back(1345.7*1.21);
+Xs_WJets.push_back(359.7*1.21);
+Xs_WJets.push_back(48.91*1.21);
+Xs_WJets.push_back(12.05*1.21);
+Xs_WJets.push_back(5.501*1.21);
+Xs_WJets.push_back(1.329*1.21);
+Xs_WJets.push_back(0.03216*1.21);
+
+Xs_VV.push_back(118.7);
+Xs_VV.push_back(47.13);
+Xs_VV.push_back(16.52);
+
+Xs_ST.push_back(3.36);	//s
+Xs_ST.push_back(80.95);	//t anti-top
+Xs_ST.push_back(136.02);//t top
+Xs_ST.push_back(35.6);	//s anti-top
+Xs_ST.push_back(35.6);	//s top
+
+Xs_QCD.push_back(27990000);		//100-200
+Xs_QCD.push_back(1712000);		//200-300
+Xs_QCD.push_back(347700);		//300-500
+Xs_QCD.push_back(32100);		//500-700
+Xs_QCD.push_back(6831);			//700-1000
+Xs_QCD.push_back(1207);			//1000-1500
+Xs_QCD.push_back(119.9);		//1500-2000
+Xs_QCD.push_back(25.24);		//2000-Inf
+
+w_TT.push_back( 35.9*Xs_TT[0]/(double)gen_no_TT[0] );
+w_TT.push_back( 35.9*Xs_TT[1]/(double)gen_no_TT[1] );
+w_TT.push_back( 35.9*Xs_TT[2]/(double)gen_no_TT[2] );
+
+for(int i=0;i<(int)DY.size();i++){
+	w_DY.push_back( 35.9*Xs_DY[i]/(double)gen_no_DY[i] );
+}
+
+for(int i=0;i<(int)WJets.size();i++){
+	w_WJets.push_back( 35.9*Xs_WJets[i]/(double)gen_no_WJets[i] );
+}
+
+for(int i=0;i<(int)VV.size();i++){
+	w_VV.push_back( 35.9*Xs_VV[i]/(double)gen_no_VV[i] );
+}
+
+for(int i=0;i<(int)ST.size();i++){
+	w_ST.push_back( 35.9*Xs_ST[i]/(double)gen_no_ST[i] );
+}
+
+w_QCD.push_back( 35.9*Xs_QCD[0]/(double)gen_no_QCD[0] );
+w_QCD.push_back( 35.9*Xs_QCD[1]/(double)gen_no_QCD[1] );
+w_QCD.push_back( 35.9*Xs_QCD[2]/(double)gen_no_QCD[2] );
+w_QCD.push_back( 35.9*Xs_QCD[3]/(double)gen_no_QCD[3] );
+w_QCD.push_back( 35.9*Xs_QCD[4]/(double)gen_no_QCD[4] );
+w_QCD.push_back( 35.9*Xs_QCD[5]/(double)gen_no_QCD[5] );
+w_QCD.push_back( 35.9*Xs_QCD[6]/(double)gen_no_QCD[6] );
+w_QCD.push_back( 35.9*Xs_QCD[7]/(double)gen_no_QCD[7] );
+

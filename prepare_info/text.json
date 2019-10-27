@@ -1,0 +1,12 @@
+{
+	"test":1.24,
+	"test1":10,
+	"test1-1":5,
+	"test2":"Hello",
+	"test3":"World",
+	"test4":true,
+	"test5":{
+		"5-1":"hi",
+		"5-2":3.223
+	}
+}
