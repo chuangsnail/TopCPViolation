@@ -125,6 +125,10 @@ cout << "test " << test_count++ << endl;
 	TH1F* h_QCD_mu = new TH1F("h_QCD_mu","",bins_No,hist_min,hist_max);
 	TH1F* h_QCD_el = new TH1F("h_QCD_el","",bins_No,hist_min,hist_max);
 	
+	TH1F* h_Data_mu = new TH1F("h_Data_mu"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
+	//"(primary title);(X-Axis title);(Y-Axis Title)"
+	TH1F* h_Data_el = new TH1F("h_Data_el"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
+	
 	//histograms for leptonic top mass
 	//
 	TH1F* h_l_TT_mu = new TH1F("h_l_TT_mu","",bins_No,hist_min,hist_max);
@@ -148,9 +152,6 @@ cout << "test " << test_count++ << endl;
 	TH1F* h_l_Data_mu = new TH1F("h_l_Data_mu"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
 	//"(primary title);(X-Axis title);(Y-Axis Title)"
 	TH1F* h_l_Data_el = new TH1F("h_l_Data_el"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-	TH1F* h_Data_mu = new TH1F("h_Data_mu"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	//"(primary title);(X-Axis title);(Y-Axis Title)"
-	TH1F* h_Data_el = new TH1F("h_Data_el"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
 
 	TH1F* h_step = new TH1F("h_step","",10,0.,10.);
 
@@ -421,6 +422,7 @@ cout << "test " << test_count++ << endl;
 
 				//luminosity cali after trigger
 
+				/*
 				if(!is_data)
 				{
 					if(channel == "mu")
@@ -428,6 +430,7 @@ cout << "test " << test_count++ << endl;
 					if(channel == "el")
 					{	weight *= lumi_cali_trg(35.615/35.9);	}
 				}
+				*/
 
 				//Do the JER first
 				if(!is_data)
@@ -604,15 +607,6 @@ cout << "test " << test_count++ << endl;
 	h_step->Write();
 
 	f_out->Close();
-
-	string name2 = "CR_inv_Data_" + time + ".root";
-	TFile* f_out2 = new TFile( name2.c_str() , "recreate" );
-
-	h_Data_mu->Write();
-	h_Data_el->Write();
-
-	f_out2->Close();
-
 
 	//*****make space free*****//
 	

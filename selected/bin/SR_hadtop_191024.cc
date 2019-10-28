@@ -129,6 +129,30 @@ cout << "test " << test_count++ << endl;
 	//"(primary title);(X-Axis title);(Y-Axis Title)"
 	TH1F* h_Data_el = new TH1F("h_Data_el"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
 
+	//histograms for leptonic top mass
+	//
+	TH1F* h_l_TT_mu = new TH1F("h_l_TT_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_TT_el = new TH1F("h_l_TT_el","",bins_No,hist_min,hist_max);
+	
+	TH1F* h_l_DY_mu = new TH1F("h_l_DY_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_DY_el = new TH1F("h_l_DY_el","",bins_No,hist_min,hist_max);
+
+	TH1F* h_l_WJets_mu = new TH1F("h_l_WJets_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_WJets_el = new TH1F("h_l_WJets_el","",bins_No,hist_min,hist_max);
+	
+	TH1F* h_l_VV_mu = new TH1F("h_l_VV_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_VV_el = new TH1F("h_l_VV_el","",bins_No,hist_min,hist_max);
+
+	TH1F* h_l_ST_mu = new TH1F("h_l_ST_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_ST_el = new TH1F("h_l_ST_el","",bins_No,hist_min,hist_max);
+	
+	TH1F* h_l_QCD_mu = new TH1F("h_l_QCD_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_QCD_el = new TH1F("h_l_QCD_el","",bins_No,hist_min,hist_max);
+	
+	TH1F* h_l_Data_mu = new TH1F("h_l_Data_mu"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
+	//"(primary title);(X-Axis title);(Y-Axis Title)"
+	TH1F* h_l_Data_el = new TH1F("h_l_Data_el"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
+	
 	TH2D* h_chi2min_mass_mu = new TH2D( "h_chi2min_mass_mu","",50,0.,500.,40,0.,200. );
 	TH2D* h_chi2min_mass_el = new TH2D( "h_chi2min_mass_el","",50,0.,500.,40,0.,200. );
 
@@ -144,6 +168,18 @@ cout << "test " << test_count++ << endl;
 	h_el.push_back(h_ST_el);		h_el.push_back(h_QCD_el);
 	h_el.push_back(h_Data_el);
 	
+	vector<TH1F*> h_l_mu;
+	h_l_mu.push_back(h_l_TT_mu);		h_l_mu.push_back(h_l_DY_mu);
+	h_l_mu.push_back(h_l_WJets_mu);		h_l_mu.push_back(h_l_VV_mu);
+	h_l_mu.push_back(h_l_ST_mu);		h_l_mu.push_back(h_l_QCD_mu);
+	h_l_mu.push_back(h_l_Data_mu);
+	
+	vector<TH1F*> h_l_el;
+	h_l_el.push_back(h_l_TT_el);		h_l_el.push_back(h_l_DY_el);
+	h_l_el.push_back(h_l_WJets_el);		h_l_el.push_back(h_l_VV_el);
+	h_l_el.push_back(h_l_ST_el);		h_l_el.push_back(h_l_QCD_el);
+	h_l_el.push_back(h_l_Data_el);
+
 	map< string, TH2D* > h_chi2min_mass;
 	h_chi2min_mass["mu"] = h_chi2min_mass_mu;
 	h_chi2min_mass["el"] = h_chi2min_mass_el;
@@ -373,12 +409,12 @@ cout << "test " << test_count++ << endl;
 				else
 				{
 					is_pass_HLT = true;
-					/*	
+						
 					if(channel == "mu")
 					{	is_pass_HLT = Pass_HLT( trgInfo, HLT_MC_mu );	}
 					else if(channel == "el")
 					{	is_pass_HLT = Pass_HLT( trgInfo, HLT_MC_el );	}
-					*/
+					
 				}
 				
 				if( !is_pass_HLT )
@@ -467,23 +503,22 @@ cout << "test " << test_count++ << endl;
 				if( chi_square_value < 0. )
 				{	printf("\n-----FAULT------\nThere is something wrong in selection!\n");		continue;	}
 
+				//Apply Chi2 Cut here
+				
+				if( !(chi_square_value < 20.))
+				{	continue;	}	
 				TLorentzVector b1, j1, j2, lepton, b2;
                 j1.SetPxPyPzE(jetInfo.Px[sel_jets[0]],jetInfo.Py[sel_jets[0]],jetInfo.Pz[sel_jets[0]],jetInfo.Energy[sel_jets[0]]);
                 j2.SetPxPyPzE(jetInfo.Px[sel_jets[1]],jetInfo.Py[sel_jets[1]],jetInfo.Pz[sel_jets[1]],jetInfo.Energy[sel_jets[1]]);
                 b1.SetPxPyPzE(jetInfo.Px[sel_b_jets[0]],jetInfo.Py[sel_b_jets[0]],jetInfo.Pz[sel_b_jets[0]],jetInfo.Energy[sel_b_jets[0]]);
                 b2.SetPxPyPzE(jetInfo.Px[sel_b_jets[1]],jetInfo.Py[sel_b_jets[1]],jetInfo.Pz[sel_b_jets[1]],jetInfo.Energy[sel_b_jets[1]]);
-				lepton.SetPxPyPzE(leptonInfo.Px[idx_Selected_Lep],leptonInfo.Py[idx_Selected_Lep],leptonInfo.Pz[idx_Selected_Lep],leptonInfo.Energy[idx_Selected_Lep]);
-				//do the JER	
+				lepton.SetPxPyPzE(leptonInfo.Px[idx_Selected_Lep],leptonInfo.Py[idx_Selected_Lep],leptonInfo.Pz[idx_Selected_Lep],leptonInfo.Energy[idx_Selected_Lep]);	
 
 
 				had_t_mass = ( b1 + j1 + j2 ).M();
 
 				h_chi2min_mass[channel]->Fill( had_t_mass, chi_square_value, weight );
 				
-				//Apply Chi2 Cut here
-				
-				if( !(chi_square_value < 20.))
-				{	continue;	}	
 				
 				//Apply lep_t_mass Cut here	
 
@@ -496,9 +531,15 @@ cout << "test " << test_count++ << endl;
 				//cout << endl << "had_t_mass : " << had_t_mass ;
 
 				if(channel == "mu")
-				{	h_mu.at(k)->Fill(had_t_mass,weight);	}
+				{	
+					h_mu.at(k)->Fill(had_t_mass,weight);
+					h_l_mu.at(k)->Fill(lep_t_mass,weight);
+				}
 				if(channel == "el")
-				{	h_el.at(k)->Fill(had_t_mass,weight);	}
+				{	
+					h_el.at(k)->Fill(had_t_mass,weight);
+					h_l_el.at(k)->Fill(lep_t_mass,weight);
+				}
 
 			}	//end of entry for-loop	
 			cout << endl << "At Set " << Set_name << " " << r+1 << "'s end, (h_mu[0], h_TT_mu) = " << h_mu[0] << ", " << h_TT_mu << endl;
@@ -535,6 +576,23 @@ cout << "test " << test_count++ << endl;
 	
 	h_Data_mu->Write();
 	h_Data_el->Write();
+
+	h_l_TT_mu->Write();
+	h_l_DY_mu->Write();
+	h_l_WJets_mu->Write();
+	h_l_VV_mu->Write();
+	h_l_ST_mu->Write();
+	h_l_QCD_mu->Write();
+
+	h_l_TT_el->Write();
+	h_l_DY_el->Write();
+	h_l_WJets_el->Write();
+	h_l_VV_el->Write();
+	h_l_ST_el->Write();
+	h_l_QCD_el->Write();
+	
+	h_l_Data_mu->Write();
+	h_l_Data_el->Write();
 
 	h_chi2min_mass_mu->Write();
 	h_chi2min_mass_el->Write();

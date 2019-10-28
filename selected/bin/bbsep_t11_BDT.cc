@@ -121,9 +121,6 @@ int test_count = 0;
 	TH1F* h_min_chi2_cor_t = new TH1F( "h_min_chi2_cor_t","",100,0.,500. );
 	TH1F* h_min_chi2_incor_t = new TH1F( "h_min_chi2_incor_t","",100,0.,500. );
 
-	TH2D* h_mvamax_mass_mu = new TH2D("h_mvamax_mass_mu","",50,0.,500.,50,0.,1.);
-	TH2D* h_mvamax_mass_el = new TH2D("h_mvamax_mass_el","",50,0.,500.,50,0.,1.);
-	TH2D* h_mvamax_mass_t = new TH2D("h_mvamax_mass_t","",50,0.,500.,50,0.,1.);
 
 	TH2D* h_chi2min_mass_mu = new TH2D("h_chi2min_mass_mu","",50,0.,500.,40,0.,200.);
 	TH2D* h_chi2min_mass_el = new TH2D("h_chi2min_mass_el","",50,0.,500.,40,0.,200.);
@@ -148,6 +145,10 @@ int test_count = 0;
 	TH1F* h_mistag_el = new TH1F("h_mistag_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
 	TH1F* h_charge_mis_el = new TH1F("h_charge_mis_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
 
+	TH2D* h_mvamax_mass_mu = new TH2D("h_mvamax_mass_mu","",50,0.,500.,bins_No1,hist_min1,hist_max1);
+	TH2D* h_mvamax_mass_el = new TH2D("h_mvamax_mass_el","",50,0.,500.,bins_No1,hist_min1,hist_max1);
+	TH2D* h_mvamax_mass_t = new TH2D("h_mvamax_mass_t","",50,0.,500.,bins_No1,hist_min1,hist_max1);
+	
 	int bins_No2 = 100;
 	double hist_min2 = 0.;
 	double hist_max2 = 500.;
