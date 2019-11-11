@@ -1,19 +1,48 @@
+#!/bin/env python
+import os
+
+def main():
+	t_name = "17"
+	time_str = "191106"
+	f = open( "test_write.cc" , "w" )
+	
+	write_info(f,t_name,time_str)
+	write_prepare(f,t_name)
+	write_mva_var(f)
+	write_loop_shell_1(f)
+	write_mva_reco(f)
+	write_loop_shell_2(f)
+	write_store(f,t_name)
+
+def write_info( f, train_name, time_str ):
+
+	text_info ="""
 /**************************************************************************************
  *
- *	File Name : cor_mva_t11_BDTG.cc
- *	Description : for train_11
- *	Date : 191016~
+ *	File Name : bbsep_t{0}_MLP.cc
+ *	Description : for train_{0}
+ *	Date : {1}~
  *	Author : Chen-Yu Chuang
  *
  ****************************************************************************************/
+	""".format(train_name, time_str)
+	f.write( text_info )
+
+
+def write_prepare( f , train_name ):
+	text_prepare_1 ="""
 #include "TopCPViolation/selected/interface/Comp_DataMC.h"
-#include "TopCPViolation/selected/interface/prepare_mva.h"
-#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_11/weights/TMVAClassification_BDTG.class.C"
+#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_{0}/weights/TMVAClassification_MLP.class.C"
 
 using namespace std;
 
 int main(int argc,char* argv[])
+	""".format( train_name )
+	f.write( text_prepare_1 )
+	f.write("""
 {
+""")
+	text_prepare_2="""	
 int test_count = 0;
 	string data_sets_name[7] = {"TT","DY","WJets","VV","ST","QCD","Data"};
 	string d6 = data_sets_name[6] + "_SM";
@@ -26,7 +55,7 @@ int test_count = 0;
 	Weights_map[data_sets_name[0]] = &w_TT;				Weights_map[data_sets_name[1]] = &w_DY;
 	Weights_map[data_sets_name[2]] = &w_WJets;			Weights_map[data_sets_name[3]] = &w_VV;
 	Weights_map[data_sets_name[4]] = &w_ST;				Weights_map[data_sets_name[5]] = &w_QCD;
-	get_lumi_weight( Weights_map, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets_full_sel.txt" );
+	get_lumi_weight( Weights_map, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./full_sel_data.txt" );
 
 	cout << "Weights_map.size()" << (int)Weights_map.size() << endl;
 	cout << "w_TT.size()  " << (int)w_TT.size() << endl;
@@ -46,7 +75,7 @@ int test_count = 0;
 	Data_Set_Path[data_sets_name[2]] = &WJets;			Data_Set_Path[data_sets_name[3]] = &VV;
 	Data_Set_Path[data_sets_name[4]] = &ST;				Data_Set_Path[data_sets_name[5]] = &QCD;
 	Data_Set_Path[d6] = &Data_SM;				Data_Set_Path[d7] = &Data_SE;
-	get_path( Data_Set_Path, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets_full_sel.txt" );
+	get_path( Data_Set_Path, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./full_sel_data.txt" );
 
 	cout << "Data_Set_Path.size()" << (int)Data_Set_Path.size() << endl;
 	cout << "TT.size()  " << (int)TT.size() << endl;
@@ -99,9 +128,6 @@ int test_count = 0;
 
 	
 	//*****************declare/make some object ( histograms or vector ......etc.)******************//
-	int bins_No = 100;
-	double hist_min = 0.;
-	double hist_max = 500.;
 
 	TH1F* h_max_mva_mu = new TH1F("h_max_mva_mu","",100,0.,1.);
 	TH1F* h_max_mva_cor_mu = new TH1F("h_max_mva_cor_mu","",100,0.,1.);
@@ -131,21 +157,52 @@ int test_count = 0;
 
 	TH2D* h_chi2min_mass_mu = new TH2D("h_chi2min_mass_mu","",50,0.,500.,40,0.,200.);
 	TH2D* h_chi2min_mass_el = new TH2D("h_chi2min_mass_el","",50,0.,500.,40,0.,200.);
-
-	//for store to calculate Poisson error
-	TH1F* h_chosen_mu = new TH1F( "h_chosen_mu","",2,0.,2. );
-	TH1F* h_cor_mu = new TH1F( "h_cor_mu","",2,0.,2. );
 		
-	TH1F* h_chosen_el = new TH1F( "h_chosen_el","",2,0.,2. );
-	TH1F* h_cor_el = new TH1F( "h_cor_el","",2,0.,2. );
-	
-	TH1F* h_chosen_t = new TH1F( "h_chosen","",2,0.,2. );
-	TH1F* h_cor_t = new TH1F( "h_cor","",2,0.,2. );
 
-	map<string, TH1F*> h_chosen, h_cor;
-	h_chosen[ "mu" ] = h_chosen_mu;		h_chosen[ "el" ] = h_chosen_el;
-	h_cor[ "mu" ] = h_cor_mu;			h_cor[ "el" ] = h_cor_el;
+	int bins_No1 = 50;
+	double hist_min1 = 0.;
+	double hist_max1 = 1.;
+	string x_axis_name = "";
+	string histogram_cons = " ;" + x_axis_name + ";Events(No.)";
+	//double bins_weight = 1./( (hist_max-hist_min)/(double)bins_No );
 	
+	
+	TH1F* h_correct_t = new TH1F("h_correct_t"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	TH1F* h_mistag_t = new TH1F("h_mistag_t"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	TH1F* h_charge_mis_t = new TH1F("h_charge_mis_t"," ;mva value;events",bins_No1,hist_min1,hist_max1); 
+
+	TH1F* h_correct_mu = new TH1F("h_correct_mu"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	TH1F* h_mistag_mu = new TH1F("h_mistag_mu"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	TH1F* h_charge_mis_mu = new TH1F("h_charge_mis_mu"," ;mva value;events",bins_No1,hist_min1,hist_max1); 
+	TH1F* h_correct_el = new TH1F("h_correct_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	TH1F* h_mistag_el = new TH1F("h_mistag_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	TH1F* h_charge_mis_el = new TH1F("h_charge_mis_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+
+	int bins_No2 = 100;
+	double hist_min2 = 0.;
+	double hist_max2 = 500.;
+	
+	TH1F* h_lt_correct_t = new TH1F("h_lt_correct_t"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	TH1F* h_lt_mistag_t = new TH1F("h_lt_mistag_t"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	TH1F* h_lt_charge_mis_t = new TH1F("h_lt_charge_mis_t"," ;mass;events",bins_No2,hist_min2,hist_max2); 
+	
+	TH1F* h_lt_correct_mu = new TH1F("h_lt_correct_mu"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	TH1F* h_lt_mistag_mu = new TH1F("h_lt_mistag_mu"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	TH1F* h_lt_charge_mis_mu = new TH1F("h_lt_charge_mis_mu"," ;mass;events",bins_No2,hist_min2,hist_max2); 
+	TH1F* h_lt_correct_el = new TH1F("h_lt_correct_el"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	TH1F* h_lt_mistag_el = new TH1F("h_lt_mistag_el"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	TH1F* h_lt_charge_mis_el = new TH1F("h_lt_charge_mis_el"," ;mass;events",bins_No2,hist_min2,hist_max2); 
+
+	int no_match_number = 0;
+
+	map<string,TH1F*> h_correct, h_charge_mis, h_mistag, h_lt_correct, h_lt_charge_mis, h_lt_mistag;
+
+	h_correct[ "mu" ] = h_correct_mu;			h_correct[ "el" ] = h_correct_el;
+	h_charge_mis[ "mu" ] = h_charge_mis_mu;		h_charge_mis[ "el" ] = h_charge_mis_el;
+	h_mistag[ "mu" ] = h_mistag_mu;				h_mistag[ "el" ] = h_mistag_el;
+	h_lt_correct[ "mu" ] = h_lt_correct_mu;				h_lt_correct[ "el" ] = h_lt_correct_el;
+	h_lt_charge_mis[ "mu" ] = h_lt_charge_mis_mu;		h_lt_charge_mis[ "el" ] = h_lt_charge_mis_el;
+	h_lt_mistag[ "mu" ] = h_lt_mistag_mu;				h_lt_mistag[ "el" ] = h_lt_mistag_el;
 	
 	map<string, TH1F*> h_max_mva, h_max_mva_cor, h_max_mva_incor;
 	map<string, TH1F*> h_min_chi2, h_min_chi2_cor, h_min_chi2_incor;
@@ -223,21 +280,35 @@ int test_count = 0;
 	
 	double mis_sel = 0.;
 	
-	double cor_mva = 0.;
-	double cor_mva_mu = 0.;
-	double cor_mva_el = 0.;
+	"""
+	f.write( text_prepare_2 )
 
-	double cor_chi2 = 0.;
-	double cor_chi2_mu = 0.;
-	double cor_chi2_el = 0.;
 
+def write_mva_var( f ):		
+	text_mva_var ="""
 	//prepare mva object
 	vector<string> inputVars;
 	inputVars.push_back("top_mass");
 	inputVars.push_back("w_mass");
 
-	ReadBDTG MyMVA( inputVars );
+	inputVars.push_back("j1j2_sumPt");
+	inputVars.push_back("j1j2_absdelEta");
+	inputVars.push_back("j1j2_delPhi");
+	
+	inputVars.push_back("hadb_deepcsv_v");
+	inputVars.push_back("whadb_delPhi");
+	inputVars.push_back("whadb_absdelEta");
+	inputVars.push_back("whadb_sumPt");
+	inputVars.push_back("whadb_delPt");
+	
+	ReadMLP MyMVA( inputVars );
+	"""
+	f.write(text_mva_var)
 
+
+def write_loop_shell_1( f ):
+		
+	text_loop_shell_1 ="""
 	//**********************Start Analysis***********************//
 
 	for(int k=0;k<(int)files_map.size();k++)
@@ -304,9 +375,6 @@ int test_count = 0;
 			bmgr.Register_Init_Maps();
 			bmgr.Register_Init_TH2( eff_b, eff_c, eff_l );
 
-			//prepare gen object
-			MVAMgr mvamgr( &genInfo, &jetInfo, &leptonInfo );
-		
 			int u = 1;	
 			for(int entry=0;entry<(int)t_entries;++entry)
 			{
@@ -420,10 +488,6 @@ int test_count = 0;
 				if( !is_pass_HLT )
 				{	continue;	}
 				
-
-				//luminosity cali after trigger
-
-
 				//Then ,do the jet-selection here
 				bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);
 
@@ -487,17 +551,6 @@ int test_count = 0;
 				
 				//mva method
 
-				mvamgr.clean();
-       			mvamgr.Get_lep_tagged_flavor( channel );
-        		mvamgr.Get_selected_info( sel_jets, sel_b_jets, idx_Selected_Lep );
-				int cor_b = -1, cor_j1 = -1, cor_j2 = -1;
-        		bool is_good_trained_evt = mvamgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
-				if( !is_good_trained_evt )
-				{
-					mis_sel += weight;
-					//continue;
-				}
-
 				if( channel == "mu" )
 				{	s_weight_mu += weight;	}
 				else if( channel == "el" )
@@ -505,15 +558,16 @@ int test_count = 0;
 
 				s_weight += weight;
 
-				h_chosen[channel]->Fill(1.,weight);
-				h_chosen_t->Fill(1.,weight);
-
 
 				int mva_hadb = -1, mva_j1 = -1, mva_j2 = -1;
-				
-				int var_num = 2;
+	"""
+	f.write( text_loop_shell_1 )
+
+def write_mva_reco( f ):
+	text_mva_reco ="""	
+				int var_num = 10;
 				double* var = new double[var_num];
-				double MAX_mva_value = -1.;				//ANN's value is 0~1
+				double max_mva_value = -1.;				//ANN's value is 0~1
 				
 				for(int B=0;B<(int)sel_b_jets.size();B++)
 				{
@@ -536,15 +590,16 @@ int test_count = 0;
 							var[0] = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
 							var[1] = ( p_mva_j1 + p_mva_j2 ).M();
 
-							/*
 							var[2] = ( jetInfo.Pt[tmp_mva_j1] + jetInfo.Pt[tmp_mva_j2] );
 							var[3] = fabs( jetInfo.Eta[tmp_mva_j1] - jetInfo.Eta[tmp_mva_j2] ) ;
 							var[4] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_j1] - jetInfo.Phi[tmp_mva_j2] );
+                            
+							var[5] = jetInfo.pfDeepCSVJetTags_probb[ tmp_mva_hadb ] + jetInfo.pfDeepCSVJetTags_probbb[ tmp_mva_hadb ];
+							var[6] = TVector2::Phi_mpi_pi( ( p_mva_j1 + p_mva_j2 ).Phi() - p_mva_hadb.Phi() );  
+							var[7] = fabs( ( p_mva_j1 + p_mva_j2 ).Eta() - p_mva_hadb.Eta() );
+							var[8] = (p_mva_j1 + p_mva_j2).Pt() + p_mva_hadb.Pt();
+                            var[9] = (p_mva_j1 + p_mva_j2).Pt() - p_mva_hadb.Pt();
 							
-							var[5] = fabs( jetInfo.Eta[tmp_mva_lepb] - leptonInfo.Eta[idx_Selected_Lep] ) ;
-							var[6] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_lepb] - leptonInfo.Phi[idx_Selected_Lep] );
-							var[7] = ( jetInfo.Pt[tmp_mva_lepb] + leptonInfo.Pt[idx_Selected_Lep] );
-							*/
 
 							vector<double> inputValues;
 							for(int in=0;in<var_num;in++ )
@@ -553,9 +608,9 @@ int test_count = 0;
 							double tmp_mva_value = MyMVA.GetMvaValue( inputValues );
 
 							//cout << tmp_mva_value << " ";
-							if( tmp_mva_value >= MAX_mva_value )
+							if( tmp_mva_value >= max_mva_value )
 							{
-								MAX_mva_value = tmp_mva_value;
+								max_mva_value = tmp_mva_value;
 								mva_hadb = tmp_mva_hadb;
 								mva_j1 = tmp_mva_j1;
 								mva_j2 = tmp_mva_j2;
@@ -565,89 +620,94 @@ int test_count = 0;
 					}
 				}
 
-				if( mva_hadb == -1 || mva_j1 == -1 || mva_j2 == -1 )
-				{
-					cerr << "There is something wrong!" << endl;
-					continue;
-				}
-
-				h_max_mva[channel]->Fill( MAX_mva_value, weight );
+				h_max_mva[channel]->Fill( max_mva_value, weight );
 				
 				delete [] var;
+	"""
+	f.write( text_mva_reco )
 
+def write_loop_shell_2( f ):
+	text_loop_shell_2 ="""
 				//calculate the correctness of mva method
 
-				if( (mva_hadb == cor_b && mva_j1 == cor_j1 && mva_j2 == cor_j2) || (mva_hadb == cor_b && mva_j1 == cor_j2 && mva_j2 == cor_j1) )
-				{
-					cor_mva += weight;
+				int mva_lepb = -1;
+				mva_lepb = ( mva_hadb == sel_b_jets.at(0) ) ? sel_b_jets.at(1) : sel_b_jets.at(0) ;
 
-					if( channel == "mu" )
-					{	cor_mva_mu += weight;	}
-					else if( channel == "el" )
-					{	cor_mva_el += weight;	}
-
-					h_max_mva_cor[channel]->Fill( MAX_mva_value, weight );
-					h_max_mva_cor_t->Fill( MAX_mva_value, weight );
-					h_cor[channel]->Fill(1.,weight);
-					h_cor_t->Fill(1.,weight);
-				}
-				else
-				{
-					h_max_mva_incor[channel]->Fill( MAX_mva_value, weight );
-					h_max_mva_incor_t->Fill( MAX_mva_value, weight );
-				}
-
-				TLorentzVector p_mva_j1, p_mva_j2, p_mva_hadb;
+				TLorentzVector p_mva_j1, p_mva_j2, p_mva_hadb, p_mva_lepb, p_mva_lepton;
 
                 p_mva_j1.SetPxPyPzE(jetInfo.Px[mva_j1],jetInfo.Py[mva_j1],jetInfo.Pz[mva_j1],jetInfo.Energy[mva_j1]);
                 p_mva_j2.SetPxPyPzE(jetInfo.Px[mva_j2],jetInfo.Py[mva_j2],jetInfo.Pz[mva_j2],jetInfo.Energy[mva_j2]);
                 p_mva_hadb.SetPxPyPzE(jetInfo.Px[mva_hadb],jetInfo.Py[mva_hadb],jetInfo.Pz[mva_hadb],jetInfo.Energy[mva_hadb]);
+                p_mva_lepb.SetPxPyPzE(jetInfo.Px[mva_lepb],jetInfo.Py[mva_lepb],jetInfo.Pz[mva_lepb],jetInfo.Energy[mva_lepb]);
+                p_mva_lepton.SetPxPyPzE(leptonInfo.Px[idx_Selected_Lep],leptonInfo.Py[idx_Selected_Lep],leptonInfo.Pz[idx_Selected_Lep],leptonInfo.Energy[idx_Selected_Lep]);
+
 				
 				double mva_tmass = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
+				double mva_lep_t_mass = ( p_mva_lepb + p_mva_lepton ).M();
 				
-				h_mvamax_mass[channel]->Fill( mva_tmass, MAX_mva_value, weight );
-				h_mvamax_mass_t->Fill( mva_tmass, MAX_mva_value, weight );
+				h_mvamax_mass[channel]->Fill( mva_tmass, max_mva_value, weight );
+				h_mvamax_mass_t->Fill( mva_tmass, max_mva_value, weight );
 
-/*				
-				//chi2 method
-				int chi2_hadb = -1, chi2_j1 = -1, chi2_j2 = -1;
-				double chi_square_value = Chi2_Sorting( jetInfo, sel_jets, sel_b_jets );
 
-				//calculate correctness of chi2 method
-				chi2_hadb = sel_b_jets.at(0);
-				chi2_j1 = sel_jets.at(0);
-				chi2_j2 = sel_jets.at(1);
-				
-				h_min_chi2[channel]->Fill( chi_square_value, weight );
+				//To see the part of bbbar separetion of mva part
+				//
+				//
+				int had_b = mva_hadb;	//which we chose in jjb (reconstructed top quark)	
+				int lep_b = mva_lepb;
+				int b = -1;
+				int bbar = -1;
+				int lep = idx_Selected_Lep;	
 
-				if( (chi2_hadb == cor_b && chi2_j1 == cor_j1 && chi2_j2 == cor_j2) || (chi2_hadb == cor_b && chi2_j1 == cor_j2 && chi2_j2 == cor_j1) )
+				//***To decide the b and bbar which is had_b and which is lep_b***//
+				/*selected lepton's charge sign is same as the hadronic b's charge sign*/
+
+				double lep_charge = leptonInfo.Charge[ lep ];
+				if( lep_charge > 0 )
 				{
-					cor_chi2 += weight;
-					if( channel == "mu" )
-					{	cor_chi2_mu += weight;	}
-					else if( channel == "el" )
-					{	cor_chi2_el += weight;	}
-					h_min_chi2_cor[channel]->Fill( chi_square_value, weight );
-					h_min_chi2_cor_t->Fill( chi_square_value, weight );
+					b = lep_b;
+					bbar = had_b;
+				}
+				else if( lep_charge < 0 )
+				{
+					b = had_b;
+					bbar = lep_b;
 				}
 				else
+				{	continue;	}
+
+				//***To decide the b and bbar matching type with GenInfo (generation level's information)***//
+				bb_matching_type bbType = no_match;			//default
+				bbType = Get_bb_Option( b , bbar , lep , jetInfo , leptonInfo , genInfo );
+				
+				//***To fill the histogram***//
+	
+				//Fill the histograms
+				switch(bbType)
 				{
-					h_min_chi2_incor[channel]->Fill( chi_square_value, weight );
-					h_min_chi2_incor_t->Fill( chi_square_value, weight );
+					case correct:
+						h_correct[channel]->Fill( max_mva_value, weight );
+						h_correct_t->Fill( max_mva_value, weight );
+						h_lt_correct[channel]->Fill( mva_lep_t_mass, weight );
+						h_lt_correct_t->Fill( mva_lep_t_mass, weight );
+						break;
+					case charge_mis:
+						h_charge_mis[channel]->Fill(max_mva_value,weight);
+						h_charge_mis_t->Fill(max_mva_value,weight);
+						h_lt_charge_mis[channel]->Fill( mva_lep_t_mass ,weight);
+						h_lt_charge_mis_t->Fill( mva_lep_t_mass ,weight);
+						break;
+					case mistag:
+						h_mistag[channel]->Fill(max_mva_value,weight);
+						h_mistag_t->Fill(max_mva_value,weight);
+						h_lt_mistag[channel]->Fill( mva_lep_t_mass ,weight);
+						h_lt_mistag_t->Fill( mva_lep_t_mass ,weight);
+						break;
+					case no_match:
+						no_match_number++;
+						break;
+					default:
+						no_match_number++;
 				}
-                
-				TLorentzVector p_chi2_j1, p_chi2_j2, p_chi2_hadb;
-
-				p_chi2_j1.SetPxPyPzE(jetInfo.Px[chi2_j1],jetInfo.Py[chi2_j1],jetInfo.Pz[chi2_j1],jetInfo.Energy[chi2_j1]);
-				p_chi2_j2.SetPxPyPzE(jetInfo.Px[chi2_j2],jetInfo.Py[chi2_j2],jetInfo.Pz[chi2_j2],jetInfo.Energy[chi2_j2]);
-				p_chi2_hadb.SetPxPyPzE(jetInfo.Px[chi2_hadb],jetInfo.Py[chi2_hadb],jetInfo.Pz[chi2_hadb],jetInfo.Energy[chi2_hadb]);
-
-				double chi2_tmass = ( p_chi2_j1 + p_chi2_j2 + p_chi2_hadb ).M();
-
-				h_chi2min_mass[channel]->Fill( chi2_tmass, chi_square_value, weight );
-*/
-
-
 			}	//end of entry for-loop	
 		}	//end of r for-loop
 	}		//end of k for-loop
@@ -657,10 +717,14 @@ int test_count = 0;
 	//normalize		
 	
 	//Save these hists to be a root file
-	
+	"""
+	f.write( text_loop_shell_2 )
+
+def write_store( f , train_name ):
+	text_store ="""
 	string time = "";
 	time = get_time_str( minute );
-	string new_file_name = "cor_mva_chi2_t11_BDTG_" + time + ".root";
+	string new_file_name = "bbsep_{0}_MLP_" + time + ".root";
 
 	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );	
 
@@ -692,38 +756,33 @@ int test_count = 0;
 
 	h_chi2min_mass_mu->Write();
 	h_chi2min_mass_el->Write();
-
-	h_cor_t->Write();
-	h_chosen_t->Write();
-	h_cor_mu->Write();
-	h_chosen_mu->Write();
-	h_cor_el->Write();
-	h_chosen_el->Write();
 	
+	h_correct_t->Write();
+	h_mistag_t->Write();
+	h_charge_mis_t ->Write();
+	
+	h_correct_mu->Write();
+	h_mistag_mu->Write();
+	h_charge_mis_mu ->Write();
+	h_correct_el->Write();
+	h_mistag_el->Write();
+	h_charge_mis_el->Write();
+
+	h_lt_correct_t->Write();
+	h_lt_mistag_t->Write();
+	h_lt_charge_mis_t->Write();
+	
+	h_lt_correct_mu->Write();
+	h_lt_mistag_mu->Write();
+	h_lt_charge_mis_mu->Write();
+	h_lt_correct_el->Write();
+	h_lt_mistag_el->Write();
+	h_lt_charge_mis_el->Write();
 
 	f_out->Close();
-	delete f_out;
+	//delete f_out;
 
-
-	h_cor_t->Divide( h_chosen_t );
-	h_cor_mu->Divide( h_chosen_mu );
-	h_cor_el->Divide( h_chosen_el );
-
-
-	cout << "mis_sel ratio: " << (double)mis_sel/t_weight  << endl;
-	cout << "s_weight, s_weight_mu, s_weight_el = [ " << s_weight << ", " << s_weight_mu << ", " << s_weight_el << " ]" << endl << endl; 
-   	
-	cout << "cor_mva ratio : " << (double)cor_mva/s_weight << endl; 
-	cout << "Error : " << (double) h_cor_t->GetBinError(2) << endl; 	
-   	cout << "cor_mva_mu ratio : " << (double)cor_mva_mu/s_weight_mu << endl; 	
-	cout << "Error : " << (double) h_cor_mu->GetBinError(2) << endl; 	
-   	cout << "cor_mva_el ratio : " << (double)cor_mva_el/s_weight_el << endl; 	
-	cout << "Error : " << (double) h_cor_el->GetBinError(2) << endl << endl; 	
-
-	cout << "cor_chi2 ratio : " << (double)cor_chi2/s_weight << endl; 	
-   	cout << "cor_chi2_mu ratio : " << (double)cor_chi2_mu/s_weight_mu << endl; 	
-   	cout << "cor_chi2_el ratio : " << (double)cor_chi2_el/s_weight_el << endl; 	
-	
+	cout << "no-match number : " <<  no_match_number << endl;
 	//*****make space free*****//
 	
 	delete f7;
@@ -733,5 +792,13 @@ int test_count = 0;
 	delete f3;
 	delete f2;
 	delete f1;
+	""".format( train_name )
+	f.write( text_store )
+	f.write("""
 }
+	""")
 
+
+
+if __name__ == '__main__':
+	main()

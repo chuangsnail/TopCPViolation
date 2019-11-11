@@ -92,7 +92,7 @@ int main(int argc,char* argv[])
 	//we need to delete the f1~f7 after finising using the objects from them		//so we delete them after selecting
 	
 	TH2F* eff_b;		TH2F* eff_c;		TH2F* eff_l;
-	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_TTbar_0pt6321.root");
+	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_WJets_0pt2217.root");	//for CR
 	f7->GetObject( "eff_b", eff_b );	f7->GetObject( "eff_c", eff_c );	f7->GetObject( "eff_l", eff_l );
 
 	
@@ -317,6 +317,7 @@ int main(int argc,char* argv[])
 			BtagManager bmgr( &jetInfo );
 			bmgr.Register_Init_Maps();
 			bmgr.Register_Init_TH2( eff_b, eff_c, eff_l );
+			bmgr.Set_OP( BTagEntry::OP_LOOSE );
 		
 			int u = 1;	
 			for(int entry=0;entry<(int)t_entries;++entry)
@@ -450,10 +451,6 @@ int main(int argc,char* argv[])
 				}
 				*/
 
-				if( !is_data )
-				{
-					JERCor( jetInfo );
-				}
 
 				//Then ,do the jet-selection here
 				bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);

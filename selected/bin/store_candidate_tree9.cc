@@ -1,10 +1,10 @@
 /**************************************************************************************
  *
- *	File Name : store_candidate_tree8.cc
+ *	File Name : store_candidate_tree9.cc
  *	Description : add new variable for mva
  *				  use new selected sample (with the GenMgr.h file instead of prepare_mva.h)! 
  *		{deepCSV}
- *	Date : 191019~
+ *	Date : 191105~
  *	Author : Chen-Yu Chuang
  *
  *	exe {old_file_name with path without .root} {just new_file_name with path without .root } {option}
@@ -128,6 +128,8 @@ int main(int argc,char* argv[])
 	double c_whadb_delPhi;
     double c_whadb_sumPt;
 	double c_whadb_delPt;
+
+	double c_lepton
 
 
     //The incoreect combination's memory need to be used many times in one events, and be stored in many events

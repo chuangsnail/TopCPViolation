@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
 	//To capture original files' name
 
-	char star_point_root[10] = "*.root";						//There is no star!!!!!!!!!!!!!!!!!!
+	char star_point_root[10] = "*.root";						//There is a star!!!!!!!!!!!!!!!!!!
 	char pre_name[500];
 	strcpy(pre_name,argv[1]);
 	//Ex. pre_name now is "/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_003/bpk_ntuple_"
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 
 	//To make the output files' name
 
-	char path_filename[500] = "/wk_cms2/cychuang/2016legacy_full_sel_file/";
+	char path_filename[500] = "/wk_cms2/cychuang/full_sel_file_2016legacy/";
 	strcat(path_filename,argv[2]);
 	char temp_path_filename[500];
 	strcpy( temp_path_filename, path_filename );
@@ -114,7 +114,13 @@ int main(int argc, char* argv[])
     //TFile* f_new;
     TTree* root_new;
    
-	cout << endl << "At the start of the pre-seletion , and the total entries number before full-selection is " << total_entries << endl;
+	cout << endl << "At the start of the full-seletion , and the total entries number before full-selection is " << total_entries << endl;
+
+	if(total_entries == 0)
+	{
+		not_end = false;
+	}
+
 
     while( not_end )
     {

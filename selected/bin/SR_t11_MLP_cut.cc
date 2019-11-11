@@ -450,11 +450,6 @@ int main(int argc,char* argv[])
 				}
 				*/
 
-				if( !is_data )
-				{
-					JERCor( jetInfo );
-				}
-
 				//Then ,do the jet-selection here
 				bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);
 
@@ -495,12 +490,12 @@ int main(int argc,char* argv[])
 						if(idx_Selected_Lep == idx_Selected_Mu){
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_tightMuIDSF,idx_Selected_Lep);
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_MuISOSF,idx_Selected_Lep);
-							weight = weight * GetLepSF_TH2F(&leptonInfo,h_MuTrgSF,idx_Selected_Lep);
+							//weight = weight * GetLepSF_TH2F(&leptonInfo,h_MuTrgSF,idx_Selected_Lep);
 						}
 						else if(idx_Selected_Lep == idx_Selected_El){
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_tightElIDSF,idx_Selected_Lep);
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_ElRECOSF,idx_Selected_Lep);
-							weight = weight * GetLepSF_TH2D(&leptonInfo,h_ElTrgSF,idx_Selected_Lep);
+							//weight = weight * GetLepSF_TH2D(&leptonInfo,h_ElTrgSF,idx_Selected_Lep);
 						}
 					
 						//do the gen-weight (second linear order calibration)

@@ -18,6 +18,7 @@
 #include "TopCPViolation/selected/interface/lep_sel.h"
 #include "TopCPViolation/selected/interface/jet_sel.h"
 #include "TopCPViolation/selected/interface/checkEvtTool.h"		//for Golden Json file
+#include "TopCPViolation/selected/interface/reweightMC.h"
 
 #include "TFile.h"
 #include "TChain.h"
@@ -199,7 +200,12 @@ int main(int argc, char* argv[])
 			{	continue;	}
         
 		   	if( idx_Selected_Lep == -1 )
-			{	continue;	}	
+			{	continue;	}
+
+			if( !is_data )
+			{
+				JERCor( jets );
+			}	
 			
 			bool pass_delR = Pass_delR_Jet_Lep( jets, leps, sel_jets, idx_Selected_Lep );
             if( !pass_delR )

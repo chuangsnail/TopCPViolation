@@ -423,14 +423,6 @@ int test_count = 0;
 
 				//luminosity cali after trigger
 
-				if(!is_data)
-				{
-					if(channel == "mu")
-					{	weight *= lumi_cali_trg(35.811/35.9);	}
-					if(channel == "el")
-					{	weight *= lumi_cali_trg(35.615/35.9);	}
-				}
-
 				//Then ,do the jet-selection here
 				bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);
 

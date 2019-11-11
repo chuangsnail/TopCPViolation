@@ -48,7 +48,7 @@ void get_ori_data_path( map< string, vector<double>* >& files_map )
 */
 
 
-void get_lumi_weight( map< string ,vector<double>* >& Weights_map , string file_path = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets.txt" )
+void get_lumi_weight( map< string ,vector<double>* >& Weights_map , string file_path = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./pre_sel_data.txt" )
 {
 	//char file_path[500] = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets.txt";
 	
@@ -101,7 +101,7 @@ void get_lumi_weight( map< string ,vector<double>* >& Weights_map , string file_
 }
 
 //void get_path( map< string, vector<char*>* >& Data_Set_Path)
-void get_path( map< string, vector<string>* >& Data_Set_Path , string file_path = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets.txt")
+void get_path( map< string, vector<string>* >& Data_Set_Path , string file_path = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./pre_sel_data.txt")
 {
 	//char file_path[500] = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets.txt";
 	//Read_info r( file_path );

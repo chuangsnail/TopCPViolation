@@ -1,20 +1,19 @@
 /**************************************************************************************
  *
- *	File Name : cor_mva_t11_BDTG.cc
- *	Description : for train_11
- *	Date : 191016~
+ *	File Name : cor_t16_MLP.cc
+ *	Description : for train_16
+ *	Date : 191105~
  *	Author : Chen-Yu Chuang
  *
  ****************************************************************************************/
 #include "TopCPViolation/selected/interface/Comp_DataMC.h"
-#include "TopCPViolation/selected/interface/prepare_mva.h"
-#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_11/weights/TMVAClassification_BDTG.class.C"
+#include "TopCPViolation/selected/interface/GenMgr.h"
+#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_16/weights/TMVAClassification_MLP.class.C"
 
 using namespace std;
 
 int main(int argc,char* argv[])
 {
-int test_count = 0;
 	string data_sets_name[7] = {"TT","DY","WJets","VV","ST","QCD","Data"};
 	string d6 = data_sets_name[6] + "_SM";
 	string d7 = data_sets_name[6] + "_SE";
@@ -26,7 +25,7 @@ int test_count = 0;
 	Weights_map[data_sets_name[0]] = &w_TT;				Weights_map[data_sets_name[1]] = &w_DY;
 	Weights_map[data_sets_name[2]] = &w_WJets;			Weights_map[data_sets_name[3]] = &w_VV;
 	Weights_map[data_sets_name[4]] = &w_ST;				Weights_map[data_sets_name[5]] = &w_QCD;
-	get_lumi_weight( Weights_map, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets_full_sel.txt" );
+	get_lumi_weight( Weights_map, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./full_sel_data.txt" );
 
 	cout << "Weights_map.size()" << (int)Weights_map.size() << endl;
 	cout << "w_TT.size()  " << (int)w_TT.size() << endl;
@@ -46,7 +45,7 @@ int test_count = 0;
 	Data_Set_Path[data_sets_name[2]] = &WJets;			Data_Set_Path[data_sets_name[3]] = &VV;
 	Data_Set_Path[data_sets_name[4]] = &ST;				Data_Set_Path[data_sets_name[5]] = &QCD;
 	Data_Set_Path[d6] = &Data_SM;				Data_Set_Path[d7] = &Data_SE;
-	get_path( Data_Set_Path, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets_full_sel.txt" );
+	get_path( Data_Set_Path, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./full_sel_data.txt" );
 
 	cout << "Data_Set_Path.size()" << (int)Data_Set_Path.size() << endl;
 	cout << "TT.size()  " << (int)TT.size() << endl;
@@ -236,7 +235,17 @@ int test_count = 0;
 	inputVars.push_back("top_mass");
 	inputVars.push_back("w_mass");
 
-	ReadBDTG MyMVA( inputVars );
+	inputVars.push_back("j1j2_sumPt");
+	inputVars.push_back("j1j2_absdelEta");
+	inputVars.push_back("j1j2_delPhi");
+	
+	inputVars.push_back("hadb_deepcsv_v");
+	inputVars.push_back("whadb_delPhi");
+	inputVars.push_back("whadb_absdelEta");
+	inputVars.push_back("whadb_sumPt");
+	inputVars.push_back("whadb_delPt");
+
+	ReadMLP MyMVA( inputVars );
 
 	//**********************Start Analysis***********************//
 
@@ -305,7 +314,7 @@ int test_count = 0;
 			bmgr.Register_Init_TH2( eff_b, eff_c, eff_l );
 
 			//prepare gen object
-			MVAMgr mvamgr( &genInfo, &jetInfo, &leptonInfo );
+			GenMgr genmgr( &genInfo, &jetInfo, &leptonInfo );
 		
 			int u = 1;	
 			for(int entry=0;entry<(int)t_entries;++entry)
@@ -422,6 +431,15 @@ int test_count = 0;
 				
 
 				//luminosity cali after trigger
+/*
+				if(!is_data)
+				{
+					if(channel == "mu")
+					{	weight *= lumi_cali_trg(35.811/35.9);	}
+					if(channel == "el")
+					{	weight *= lumi_cali_trg(35.615/35.9);	}
+				}
+*/				
 
 
 				//Then ,do the jet-selection here
@@ -487,11 +505,8 @@ int test_count = 0;
 				
 				//mva method
 
-				mvamgr.clean();
-       			mvamgr.Get_lep_tagged_flavor( channel );
-        		mvamgr.Get_selected_info( sel_jets, sel_b_jets, idx_Selected_Lep );
 				int cor_b = -1, cor_j1 = -1, cor_j2 = -1;
-        		bool is_good_trained_evt = mvamgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
+        		bool is_good_trained_evt = genmgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
 				if( !is_good_trained_evt )
 				{
 					mis_sel += weight;
@@ -511,7 +526,7 @@ int test_count = 0;
 
 				int mva_hadb = -1, mva_j1 = -1, mva_j2 = -1;
 				
-				int var_num = 2;
+				int var_num = 10;
 				double* var = new double[var_num];
 				double MAX_mva_value = -1.;				//ANN's value is 0~1
 				
@@ -536,15 +551,15 @@ int test_count = 0;
 							var[0] = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
 							var[1] = ( p_mva_j1 + p_mva_j2 ).M();
 
-							/*
 							var[2] = ( jetInfo.Pt[tmp_mva_j1] + jetInfo.Pt[tmp_mva_j2] );
 							var[3] = fabs( jetInfo.Eta[tmp_mva_j1] - jetInfo.Eta[tmp_mva_j2] ) ;
 							var[4] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_j1] - jetInfo.Phi[tmp_mva_j2] );
 							
-							var[5] = fabs( jetInfo.Eta[tmp_mva_lepb] - leptonInfo.Eta[idx_Selected_Lep] ) ;
-							var[6] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_lepb] - leptonInfo.Phi[idx_Selected_Lep] );
-							var[7] = ( jetInfo.Pt[tmp_mva_lepb] + leptonInfo.Pt[idx_Selected_Lep] );
-							*/
+                            var[5] = jetInfo.pfDeepCSVJetTags_probb[ tmp_mva_hadb ] + jetInfo.pfDeepCSVJetTags_probbb[ tmp_mva_hadb ];
+							var[6] = TVector2::Phi_mpi_pi( ( p_mva_j1 + p_mva_j2 ).Phi() - p_mva_hadb.Phi() );  
+							var[7] = fabs( ( p_mva_j1 + p_mva_j2 ).Eta() - p_mva_hadb.Eta() );
+							var[8] = (p_mva_j1 + p_mva_j2).Pt() + p_mva_hadb.Pt();
+                            var[9] = (p_mva_j1 + p_mva_j2).Pt() - p_mva_hadb.Pt();
 
 							vector<double> inputValues;
 							for(int in=0;in<var_num;in++ )
@@ -608,12 +623,13 @@ int test_count = 0;
 				h_mvamax_mass[channel]->Fill( mva_tmass, MAX_mva_value, weight );
 				h_mvamax_mass_t->Fill( mva_tmass, MAX_mva_value, weight );
 
-/*				
+				/*
 				//chi2 method
 				int chi2_hadb = -1, chi2_j1 = -1, chi2_j2 = -1;
 				double chi_square_value = Chi2_Sorting( jetInfo, sel_jets, sel_b_jets );
 
 				//calculate correctness of chi2 method
+				
 				chi2_hadb = sel_b_jets.at(0);
 				chi2_j1 = sel_jets.at(0);
 				chi2_j2 = sel_jets.at(1);
@@ -645,8 +661,7 @@ int test_count = 0;
 				double chi2_tmass = ( p_chi2_j1 + p_chi2_j2 + p_chi2_hadb ).M();
 
 				h_chi2min_mass[channel]->Fill( chi2_tmass, chi_square_value, weight );
-*/
-
+				*/
 
 			}	//end of entry for-loop	
 		}	//end of r for-loop
@@ -658,9 +673,11 @@ int test_count = 0;
 	
 	//Save these hists to be a root file
 	
-	string time = "";
-	time = get_time_str( minute );
-	string new_file_name = "cor_mva_chi2_t11_BDTG_" + time + ".root";
+
+	string pre_file_name = "cor_t16_MLP";
+	string time_str = "";
+	time_str = get_time_str( minute );
+	string new_file_name = pre_file_name + "_" + time_str + ".root";
 
 	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );	
 
@@ -709,20 +726,25 @@ int test_count = 0;
 	h_cor_mu->Divide( h_chosen_mu );
 	h_cor_el->Divide( h_chosen_el );
 
+	ofstream f;
+	f.open( "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./cor_result.txt",fstream::app );		
 
-	cout << "mis_sel ratio: " << (double)mis_sel/t_weight  << endl;
-	cout << "s_weight, s_weight_mu, s_weight_el = [ " << s_weight << ", " << s_weight_mu << ", " << s_weight_el << " ]" << endl << endl; 
+	f << "File name " << pre_file_name << endl;
+	f << "Finish time is : " << time_str << endl;
+
+	f << "mis_sel ratio: " << (double)mis_sel/t_weight  << endl;
+	f << "s_weight, s_weight_mu, s_weight_el = [ " << s_weight << ", " << s_weight_mu << ", " << s_weight_el << " ]" << endl << endl; 
    	
-	cout << "cor_mva ratio : " << (double)cor_mva/s_weight << endl; 
-	cout << "Error : " << (double) h_cor_t->GetBinError(2) << endl; 	
-   	cout << "cor_mva_mu ratio : " << (double)cor_mva_mu/s_weight_mu << endl; 	
-	cout << "Error : " << (double) h_cor_mu->GetBinError(2) << endl; 	
-   	cout << "cor_mva_el ratio : " << (double)cor_mva_el/s_weight_el << endl; 	
-	cout << "Error : " << (double) h_cor_el->GetBinError(2) << endl << endl; 	
+	f << "cor_mva ratio : " << (double)cor_mva/s_weight << endl; 
+	f << "Error : " << (double) h_cor_t->GetBinError(2) << endl; 	
+   	f << "cor_mva_mu ratio : " << (double)cor_mva_mu/s_weight_mu << endl; 	
+	f << "Error : " << (double) h_cor_mu->GetBinError(2) << endl; 	
+   	f << "cor_mva_el ratio : " << (double)cor_mva_el/s_weight_el << endl; 	
+	f << "Error : " << (double) h_cor_el->GetBinError(2) << endl; 	
 
-	cout << "cor_chi2 ratio : " << (double)cor_chi2/s_weight << endl; 	
-   	cout << "cor_chi2_mu ratio : " << (double)cor_chi2_mu/s_weight_mu << endl; 	
-   	cout << "cor_chi2_el ratio : " << (double)cor_chi2_el/s_weight_el << endl; 	
+	f << endl << "===========================================================================" << endl;
+	
+	f.close();	
 	
 	//*****make space free*****//
 	

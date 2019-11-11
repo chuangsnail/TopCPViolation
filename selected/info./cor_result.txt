@@ -1,0 +1,13 @@
+File name cor_t16_MLP
+Finish time is : 191105_1554
+mis_sel ratio: 0.582332
+s_weight, s_weight_mu, s_weight_el = [ 569309, 355580, 213729 ]
+
+cor_mva ratio : 0.209176
+Error : 0.000228336
+cor_mva_mu ratio : 0.213768
+Error : 0.000295518
+cor_mva_el ratio : 0.201536
+Error : 0.000367359
+
+===========================================================================

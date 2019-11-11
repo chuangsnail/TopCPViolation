@@ -1,24 +1,24 @@
 /**************************************************************************************
  *
- *	File Name : cor_mva_t11_BDTG.cc
- *	Description : for train_11
- *	Date : 191016~
+ *	File Name : SR_hadtop_191024.cc
+ *	Description : change dataset to dbl_pre_sel_files!
+ *	Date : 191024~
  *	Author : Chen-Yu Chuang
  *
  ****************************************************************************************/
 #include "TopCPViolation/selected/interface/Comp_DataMC.h"
-#include "TopCPViolation/selected/interface/prepare_mva.h"
-#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_11/weights/TMVAClassification_BDTG.class.C"
 
 using namespace std;
 
 int main(int argc,char* argv[])
 {
 int test_count = 0;
+cout << "test " << test_count++ << endl;
 	string data_sets_name[7] = {"TT","DY","WJets","VV","ST","QCD","Data"};
 	string d6 = data_sets_name[6] + "_SM";
 	string d7 = data_sets_name[6] + "_SE";
 	
+cout << "test " << test_count++ << endl;
 	//***********To finish something about weight***********//
 
 	vector<double> w_TT, w_DY, w_WJets, w_VV, w_ST, w_QCD;
@@ -26,7 +26,7 @@ int test_count = 0;
 	Weights_map[data_sets_name[0]] = &w_TT;				Weights_map[data_sets_name[1]] = &w_DY;
 	Weights_map[data_sets_name[2]] = &w_WJets;			Weights_map[data_sets_name[3]] = &w_VV;
 	Weights_map[data_sets_name[4]] = &w_ST;				Weights_map[data_sets_name[5]] = &w_QCD;
-	get_lumi_weight( Weights_map, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets_full_sel.txt" );
+	get_lumi_weight( Weights_map , "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./pre_sel_data.txt");
 
 	cout << "Weights_map.size()" << (int)Weights_map.size() << endl;
 	cout << "w_TT.size()  " << (int)w_TT.size() << endl;
@@ -46,7 +46,7 @@ int test_count = 0;
 	Data_Set_Path[data_sets_name[2]] = &WJets;			Data_Set_Path[data_sets_name[3]] = &VV;
 	Data_Set_Path[data_sets_name[4]] = &ST;				Data_Set_Path[data_sets_name[5]] = &QCD;
 	Data_Set_Path[d6] = &Data_SM;				Data_Set_Path[d7] = &Data_SE;
-	get_path( Data_Set_Path, "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./data_sets_full_sel.txt" );
+	get_path( Data_Set_Path ,"/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./pre_sel_data.txt");
 
 	cout << "Data_Set_Path.size()" << (int)Data_Set_Path.size() << endl;
 	cout << "TT.size()  " << (int)TT.size() << endl;
@@ -99,69 +99,90 @@ int test_count = 0;
 
 	
 	//*****************declare/make some object ( histograms or vector ......etc.)******************//
-	int bins_No = 100;
+
+	int bins_No = 50;
 	double hist_min = 0.;
 	double hist_max = 500.;
+	string x_axis_name = "";
+	string histogram_cons = " ;" + x_axis_name + ";Events(No.)";
+	//double bins_weight = 1./( (hist_max-hist_min)/(double)bins_No );
 
-	TH1F* h_max_mva_mu = new TH1F("h_max_mva_mu","",100,0.,1.);
-	TH1F* h_max_mva_cor_mu = new TH1F("h_max_mva_cor_mu","",100,0.,1.);
-	TH1F* h_max_mva_incor_mu = new TH1F("h_max_mva_incor_mu","",100,0.,1.);
+	TH1F* h_TT_mu = new TH1F("h_TT_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_TT_el = new TH1F("h_TT_el","",bins_No,hist_min,hist_max);
 	
-	TH1F* h_min_chi2_mu = new TH1F("h_min_chi2_mu","",100,0.,500.);
-	TH1F* h_min_chi2_cor_mu = new TH1F("h_min_chi2_cor_mu","",100,0.,500.);
-	TH1F* h_min_chi2_incor_mu = new TH1F("h_min_chi2_incor_mu","",100,0.,500.);
+	TH1F* h_DY_mu = new TH1F("h_DY_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_DY_el = new TH1F("h_DY_el","",bins_No,hist_min,hist_max);
 
-	TH1F* h_max_mva_el = new TH1F("h_max_mva_el","",100,0.,1.);
-	TH1F* h_max_mva_cor_el = new TH1F("h_max_mva_cor_el","",100,0.,1.);
-	TH1F* h_max_mva_incor_el = new TH1F("h_max_mva_incor_el","",100,0.,1.);
+	TH1F* h_WJets_mu = new TH1F("h_WJets_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_WJets_el = new TH1F("h_WJets_el","",bins_No,hist_min,hist_max);
 	
-	TH1F* h_min_chi2_el = new TH1F("h_min_chi2_el","",100,0.,500.);
-	TH1F* h_min_chi2_cor_el = new TH1F("h_min_chi2_cor_el","",100,0.,500.);
-	TH1F* h_min_chi2_incor_el = new TH1F("h_min_chi2_incor_el","",100,0.,500.);
+	TH1F* h_VV_mu = new TH1F("h_VV_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_VV_el = new TH1F("h_VV_el","",bins_No,hist_min,hist_max);
+
+	TH1F* h_ST_mu = new TH1F("h_ST_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_ST_el = new TH1F("h_ST_el","",bins_No,hist_min,hist_max);
 	
-	TH1F* h_max_mva_cor_t = new TH1F( "h_max_mva_cor_t","",100,0.,1. );
-	TH1F* h_max_mva_incor_t = new TH1F( "h_max_mva_incor_t","",100,0.,1. );
-
-	TH1F* h_min_chi2_cor_t = new TH1F( "h_min_chi2_cor_t","",100,0.,500. );
-	TH1F* h_min_chi2_incor_t = new TH1F( "h_min_chi2_incor_t","",100,0.,500. );
-
-	TH2D* h_mvamax_mass_mu = new TH2D("h_mvamax_mass_mu","",50,0.,500.,50,0.,1.);
-	TH2D* h_mvamax_mass_el = new TH2D("h_mvamax_mass_el","",50,0.,500.,50,0.,1.);
-	TH2D* h_mvamax_mass_t = new TH2D("h_mvamax_mass_t","",50,0.,500.,50,0.,1.);
-
-	TH2D* h_chi2min_mass_mu = new TH2D("h_chi2min_mass_mu","",50,0.,500.,40,0.,200.);
-	TH2D* h_chi2min_mass_el = new TH2D("h_chi2min_mass_el","",50,0.,500.,40,0.,200.);
-
-	//for store to calculate Poisson error
-	TH1F* h_chosen_mu = new TH1F( "h_chosen_mu","",2,0.,2. );
-	TH1F* h_cor_mu = new TH1F( "h_cor_mu","",2,0.,2. );
-		
-	TH1F* h_chosen_el = new TH1F( "h_chosen_el","",2,0.,2. );
-	TH1F* h_cor_el = new TH1F( "h_cor_el","",2,0.,2. );
+	TH1F* h_QCD_mu = new TH1F("h_QCD_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_QCD_el = new TH1F("h_QCD_el","",bins_No,hist_min,hist_max);
 	
-	TH1F* h_chosen_t = new TH1F( "h_chosen","",2,0.,2. );
-	TH1F* h_cor_t = new TH1F( "h_cor","",2,0.,2. );
+	TH1F* h_Data_mu = new TH1F("h_Data_mu"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
+	//"(primary title);(X-Axis title);(Y-Axis Title)"
+	TH1F* h_Data_el = new TH1F("h_Data_el"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
 
-	map<string, TH1F*> h_chosen, h_cor;
-	h_chosen[ "mu" ] = h_chosen_mu;		h_chosen[ "el" ] = h_chosen_el;
-	h_cor[ "mu" ] = h_cor_mu;			h_cor[ "el" ] = h_cor_el;
+	//histograms for leptonic top mass
+	//
+	TH1F* h_l_TT_mu = new TH1F("h_l_TT_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_TT_el = new TH1F("h_l_TT_el","",bins_No,hist_min,hist_max);
 	
+	TH1F* h_l_DY_mu = new TH1F("h_l_DY_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_DY_el = new TH1F("h_l_DY_el","",bins_No,hist_min,hist_max);
+
+	TH1F* h_l_WJets_mu = new TH1F("h_l_WJets_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_WJets_el = new TH1F("h_l_WJets_el","",bins_No,hist_min,hist_max);
 	
-	map<string, TH1F*> h_max_mva, h_max_mva_cor, h_max_mva_incor;
-	map<string, TH1F*> h_min_chi2, h_min_chi2_cor, h_min_chi2_incor;
-	map<string, TH2D*> h_chi2min_mass, h_mvamax_mass;
+	TH1F* h_l_VV_mu = new TH1F("h_l_VV_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_VV_el = new TH1F("h_l_VV_el","",bins_No,hist_min,hist_max);
 
-	h_max_mva[ "mu" ] = h_max_mva_mu;					h_max_mva[ "el" ] = h_max_mva_el;
-	h_max_mva_cor[ "mu" ] = h_max_mva_cor_mu;			h_max_mva_cor[ "el" ] = h_max_mva_cor_el;
-	h_max_mva_incor[ "mu" ] = h_max_mva_incor_mu;		h_max_mva_incor[ "el" ] = h_max_mva_incor_el;
+	TH1F* h_l_ST_mu = new TH1F("h_l_ST_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_ST_el = new TH1F("h_l_ST_el","",bins_No,hist_min,hist_max);
+	
+	TH1F* h_l_QCD_mu = new TH1F("h_l_QCD_mu","",bins_No,hist_min,hist_max);
+	TH1F* h_l_QCD_el = new TH1F("h_l_QCD_el","",bins_No,hist_min,hist_max);
+	
+	TH1F* h_l_Data_mu = new TH1F("h_l_Data_mu"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
+	//"(primary title);(X-Axis title);(Y-Axis Title)"
+	TH1F* h_l_Data_el = new TH1F("h_l_Data_el"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
+	
+	TH2D* h_chi2min_mass_mu = new TH2D( "h_chi2min_mass_mu","",50,0.,500.,40,0.,200. );
+	TH2D* h_chi2min_mass_el = new TH2D( "h_chi2min_mass_el","",50,0.,500.,40,0.,200. );
 
-	h_min_chi2[ "mu" ] = h_min_chi2_mu;					h_min_chi2[ "el" ] = h_min_chi2_el;
-	h_min_chi2_cor[ "mu" ] = h_min_chi2_cor_mu;			h_min_chi2_cor[ "el" ] = h_min_chi2_cor_el;
-	h_min_chi2_incor[ "mu" ] = h_min_chi2_incor_mu;		h_min_chi2_incor[ "el" ] = h_min_chi2_incor_el;
+	vector<TH1F*> h_mu;
+	h_mu.push_back(h_TT_mu);		h_mu.push_back(h_DY_mu);
+	h_mu.push_back(h_WJets_mu);		h_mu.push_back(h_VV_mu);
+	h_mu.push_back(h_ST_mu);		h_mu.push_back(h_QCD_mu);
+	h_mu.push_back(h_Data_mu);
 
-	h_chi2min_mass[ "mu" ] = h_chi2min_mass_mu;			h_chi2min_mass[ "el" ] = h_chi2min_mass_el;
-	h_mvamax_mass[ "mu" ] = h_mvamax_mass_mu;			h_mvamax_mass[ "el" ] = h_mvamax_mass_el;
+	vector<TH1F*> h_el;
+	h_el.push_back(h_TT_el);		h_el.push_back(h_DY_el);
+	h_el.push_back(h_WJets_el);		h_el.push_back(h_VV_el);
+	h_el.push_back(h_ST_el);		h_el.push_back(h_QCD_el);
+	h_el.push_back(h_Data_el);
+	
+	vector<TH1F*> h_l_mu;
+	h_l_mu.push_back(h_l_TT_mu);		h_l_mu.push_back(h_l_DY_mu);
+	h_l_mu.push_back(h_l_WJets_mu);		h_l_mu.push_back(h_l_VV_mu);
+	h_l_mu.push_back(h_l_ST_mu);		h_l_mu.push_back(h_l_QCD_mu);
+	h_l_mu.push_back(h_l_Data_mu);
+	
+	vector<TH1F*> h_l_el;
+	h_l_el.push_back(h_l_TT_el);		h_l_el.push_back(h_l_DY_el);
+	h_l_el.push_back(h_l_WJets_el);		h_l_el.push_back(h_l_VV_el);
+	h_l_el.push_back(h_l_ST_el);		h_l_el.push_back(h_l_QCD_el);
+	h_l_el.push_back(h_l_Data_el);
 
+	map< string, TH2D* > h_chi2min_mass;
+	h_chi2min_mass["mu"] = h_chi2min_mass_mu;
+	h_chi2min_mass["el"] = h_chi2min_mass_el;
 
 	//**********initial the files and TChain and make the file map and weight map***********//
 
@@ -174,19 +195,19 @@ int test_count = 0;
 	File f_TT_001((char*)TT[0].c_str());
 	files_TT.push_back(f_TT_001);
 	for(int i=0;i<(int)DY.size();i++){
-		File f_DY((char*)DY[i].c_str());		files_DY.push_back(f_DY);
+		File f_DY((char*)DY[i].c_str());			files_DY.push_back(f_DY);
 	}
 	for(int i=0;i<(int)WJets.size();i++){
-		File f_WJets((char*)WJets[i].c_str());	files_WJets.push_back(f_WJets);
+		File f_WJets((char*)WJets[i].c_str());		files_WJets.push_back(f_WJets);
 	}
 	for(int i=0;i<(int)VV.size();i++){
-		File f_VV((char*)VV[i].c_str());		files_VV.push_back(f_VV);
+		File f_VV((char*)VV[i].c_str());			files_VV.push_back(f_VV);
 	}
 	for(int i=0;i<(int)ST.size();i++){
-		File f_ST((char*)ST[i].c_str());		files_ST.push_back(f_ST);
+		File f_ST((char*)ST[i].c_str());			files_ST.push_back(f_ST);
 	}	
 	for(int i=0;i<(int)QCD.size();i++){
-		File f_QCD((char*)QCD[i].c_str());		files_QCD.push_back(f_QCD);
+		File f_QCD((char*)QCD[i].c_str());			files_QCD.push_back(f_QCD);
 	}
 
 	files_map[data_sets_name[0]] = &files_TT;		files_map[data_sets_name[1]] = &files_DY;
@@ -210,34 +231,6 @@ int test_count = 0;
 	files_Data.push_back(f_Data_1);		files_Data.push_back(f_Data_2);
 
 	files_map[ data_sets_name[6] ] = &files_Data;
-
-	//prepare count object
-	
-	double t_weight_el = 0.;
-	double t_weight_mu = 0.;
-	double t_weight = 0.;
-
-	double s_weight_el = 0.;
-	double s_weight_mu = 0.;
-	double s_weight = 0.;
-	
-	double mis_sel = 0.;
-	
-	double cor_mva = 0.;
-	double cor_mva_mu = 0.;
-	double cor_mva_el = 0.;
-
-	double cor_chi2 = 0.;
-	double cor_chi2_mu = 0.;
-	double cor_chi2_el = 0.;
-
-	//prepare mva object
-	vector<string> inputVars;
-	inputVars.push_back("top_mass");
-	inputVars.push_back("w_mass");
-
-	ReadBDTG MyMVA( inputVars );
-
 	//**********************Start Analysis***********************//
 
 	for(int k=0;k<(int)files_map.size();k++)
@@ -255,9 +248,12 @@ int test_count = 0;
 		{
 			//just apply TTMC/Data//
 			//if( Set_name != "TT" && Set_name != "Data" )
-			if( Set_name != "TT" )
-			{	break;	}
+			//if( Set_name != "TT" )
+			//{	break;	}
+			////////////////////////
 
+			cout << "At Set " << Set_name << " " << r+1 << "'s start, (h_mu[0], h_TT_mu) = " << h_mu[0] << ", " << h_TT_mu << endl;
+			
 			if(!is_data){
 				if( r >= (int)Data_Set_Path[ Set_name ]->size() )
 				{	break;	}
@@ -303,9 +299,6 @@ int test_count = 0;
 			BtagManager bmgr( &jetInfo );
 			bmgr.Register_Init_Maps();
 			bmgr.Register_Init_TH2( eff_b, eff_c, eff_l );
-
-			//prepare gen object
-			MVAMgr mvamgr( &genInfo, &jetInfo, &leptonInfo );
 		
 			int u = 1;	
 			for(int entry=0;entry<(int)t_entries;++entry)
@@ -313,8 +306,6 @@ int test_count = 0;
 				//test!!!
 				//if(entry>=3000.)
 				//{	break;	}
-
-				//cout << "[ Entry " << entry << " ]" << endl;
 				
 				if( (double)entry/t_entries >= 0.1*u )
 				{	
@@ -324,6 +315,11 @@ int test_count = 0;
 
 				( files_map[ Set_name ]->at(r).ch )->GetEntry(entry);
 				//check
+				if( h_TT_mu != h_mu.at(0) )
+				{
+					cout << endl << "h_TT_mu != h_mu(0)  at entry-" << entry << " of set " << Set_name << "'s " << r+1 << " one!" << endl;
+					break;
+				}
 				
 				//Set lumi_Weight first
 
@@ -411,23 +407,38 @@ int test_count = 0;
 					{	is_pass_HLT = Pass_HLT( trgInfo, HLT_Data_el );	}
 				}
 				else
-				{	
+				{
+					is_pass_HLT = true;
+						
 					if(channel == "mu")
 					{	is_pass_HLT = Pass_HLT( trgInfo, HLT_MC_mu );	}
 					else if(channel == "el")
 					{	is_pass_HLT = Pass_HLT( trgInfo, HLT_MC_el );	}
+					
 				}
+				
 				if( !is_pass_HLT )
 				{	continue;	}
 				
 
 				//luminosity cali after trigger
 
+				/*
+				if(!is_data)
+				{
+					if(channel == "mu")
+					{	weight *= lumi_cali_trg(35.811/35.9);	}
+					if(channel == "el")
+					{	weight *= lumi_cali_trg(35.615/35.9);	}
+				}
+				*/
 
 				//Then ,do the jet-selection here
 				bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);
 
-
+				double chi_square_value = -1.,	had_t_mass = -1.;
+				double lep_t_mass = -1.;
+		
 				if( (is_mu_channel && !is_el_channel) || (is_el_channel && !is_mu_channel) )
 				{
 					if( !pass_sel_jet )
@@ -456,199 +467,78 @@ int test_count = 0;
 						btag_weight = bmgr.Get_Btag_Weight();
 						weight *= btag_weight;
 
+						//double SF1 = bmgr.Get_Btag_Scale_Factor( sel_b_jets.at(0) );
+						//double SF2 = bmgr.Get_Btag_Scale_Factor( sel_b_jets.at(1) );
+						//cout << "Btag ( SF1, SF2, SF1*SF2 ) of tagged 2 b-jets are ( " << SF1 << ", " << SF2 << ", " << SF1*SF2 << " )" << endl;
+
 						//do the lepton scale factor
 						if(idx_Selected_Lep == idx_Selected_Mu){
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_tightMuIDSF,idx_Selected_Lep);
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_MuISOSF,idx_Selected_Lep);
-							weight = weight * GetLepSF_TH2F(&leptonInfo,h_MuTrgSF,idx_Selected_Lep);
+							//weight = weight * GetLepSF_TH2F(&leptonInfo,h_MuTrgSF,idx_Selected_Lep);
 						}
 						else if(idx_Selected_Lep == idx_Selected_El){
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_tightElIDSF,idx_Selected_Lep);
 							weight = weight * GetLepSF_TH2F(&leptonInfo,h_ElRECOSF,idx_Selected_Lep);
-							weight = weight * GetLepSF_TH2D(&leptonInfo,h_ElTrgSF,idx_Selected_Lep);
+							//weight = weight * GetLepSF_TH2D(&leptonInfo,h_ElTrgSF,idx_Selected_Lep);
 						}
 					
 						//do the gen-weight (second linear order calibration)
 						weight *= Get_GenMinus_Weight(genInfo);
 					}
+					//use chi2-Sorting to choose best choice of reconstruct top quark's mass 
+					chi_square_value = Chi2_Sorting(jetInfo,sel_jets,sel_b_jets);	
 				}
 				else
 				{	continue;	}
 
-				//claculate channel's total weight
-				if( channel == "mu" )
-				{	t_weight_mu += weight;	}
-				else if( channel == "el" )
-				{	t_weight_el += weight;	}
+				//check if chi-2 sorting is sucessful
 
-				t_weight += weight;
+				if( chi_square_value < 0. )
+				{	printf("\n-----FAULT------\nThere is something wrong in selection!\n");		continue;	}
 
-				//do the mva algorithm to pick up the best combination
+				//Apply Chi2 Cut here
 				
-				//mva method
+				if( !(chi_square_value < 20.))
+				{	continue;	}	
+				TLorentzVector b1, j1, j2, lepton, b2;
+                j1.SetPxPyPzE(jetInfo.Px[sel_jets[0]],jetInfo.Py[sel_jets[0]],jetInfo.Pz[sel_jets[0]],jetInfo.Energy[sel_jets[0]]);
+                j2.SetPxPyPzE(jetInfo.Px[sel_jets[1]],jetInfo.Py[sel_jets[1]],jetInfo.Pz[sel_jets[1]],jetInfo.Energy[sel_jets[1]]);
+                b1.SetPxPyPzE(jetInfo.Px[sel_b_jets[0]],jetInfo.Py[sel_b_jets[0]],jetInfo.Pz[sel_b_jets[0]],jetInfo.Energy[sel_b_jets[0]]);
+                b2.SetPxPyPzE(jetInfo.Px[sel_b_jets[1]],jetInfo.Py[sel_b_jets[1]],jetInfo.Pz[sel_b_jets[1]],jetInfo.Energy[sel_b_jets[1]]);
+				lepton.SetPxPyPzE(leptonInfo.Px[idx_Selected_Lep],leptonInfo.Py[idx_Selected_Lep],leptonInfo.Pz[idx_Selected_Lep],leptonInfo.Energy[idx_Selected_Lep]);	
 
-				mvamgr.clean();
-       			mvamgr.Get_lep_tagged_flavor( channel );
-        		mvamgr.Get_selected_info( sel_jets, sel_b_jets, idx_Selected_Lep );
-				int cor_b = -1, cor_j1 = -1, cor_j2 = -1;
-        		bool is_good_trained_evt = mvamgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
-				if( !is_good_trained_evt )
-				{
-					mis_sel += weight;
-					//continue;
+
+				had_t_mass = ( b1 + j1 + j2 ).M();
+
+				h_chi2min_mass[channel]->Fill( had_t_mass, chi_square_value, weight );
+				
+				
+				//Apply lep_t_mass Cut here	
+
+				lep_t_mass = (lepton + b2).M();
+					
+				if( !(lep_t_mass < 150.))
+				{	continue;	}
+				
+
+				//cout << endl << "had_t_mass : " << had_t_mass ;
+
+				if(channel == "mu")
+				{	
+					h_mu.at(k)->Fill(had_t_mass,weight);
+					h_l_mu.at(k)->Fill(lep_t_mass,weight);
 				}
-
-				if( channel == "mu" )
-				{	s_weight_mu += weight;	}
-				else if( channel == "el" )
-				{	s_weight_el += weight;	}
-
-				s_weight += weight;
-
-				h_chosen[channel]->Fill(1.,weight);
-				h_chosen_t->Fill(1.,weight);
-
-
-				int mva_hadb = -1, mva_j1 = -1, mva_j2 = -1;
-				
-				int var_num = 2;
-				double* var = new double[var_num];
-				double MAX_mva_value = -1.;				//ANN's value is 0~1
-				
-				for(int B=0;B<(int)sel_b_jets.size();B++)
-				{
-					int lB = (B == 0) ? 1 : 0 ;
-					for(int J1=0;J1<(int)sel_jets.size();J1++)
-					{
-						for(int J2=J1+1;J2<(int)sel_jets.size();J2++)
-						{
-							int tmp_mva_lepb = sel_b_jets.at(lB);
-							int tmp_mva_hadb = sel_b_jets.at(B);
-							int tmp_mva_j1 = sel_jets.at(J1);
-							int tmp_mva_j2 = sel_jets.at(J2);
-
-							TLorentzVector p_mva_j1, p_mva_j2, p_mva_hadb;
-
-                			p_mva_j1.SetPxPyPzE(jetInfo.Px[tmp_mva_j1],jetInfo.Py[tmp_mva_j1],jetInfo.Pz[tmp_mva_j1],jetInfo.Energy[tmp_mva_j1]);
-                			p_mva_j2.SetPxPyPzE(jetInfo.Px[tmp_mva_j2],jetInfo.Py[tmp_mva_j2],jetInfo.Pz[tmp_mva_j2],jetInfo.Energy[tmp_mva_j2]);
-                			p_mva_hadb.SetPxPyPzE(jetInfo.Px[tmp_mva_hadb],jetInfo.Py[tmp_mva_hadb],jetInfo.Pz[tmp_mva_hadb],jetInfo.Energy[tmp_mva_hadb]);
-				
-							var[0] = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
-							var[1] = ( p_mva_j1 + p_mva_j2 ).M();
-
-							/*
-							var[2] = ( jetInfo.Pt[tmp_mva_j1] + jetInfo.Pt[tmp_mva_j2] );
-							var[3] = fabs( jetInfo.Eta[tmp_mva_j1] - jetInfo.Eta[tmp_mva_j2] ) ;
-							var[4] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_j1] - jetInfo.Phi[tmp_mva_j2] );
-							
-							var[5] = fabs( jetInfo.Eta[tmp_mva_lepb] - leptonInfo.Eta[idx_Selected_Lep] ) ;
-							var[6] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_lepb] - leptonInfo.Phi[idx_Selected_Lep] );
-							var[7] = ( jetInfo.Pt[tmp_mva_lepb] + leptonInfo.Pt[idx_Selected_Lep] );
-							*/
-
-							vector<double> inputValues;
-							for(int in=0;in<var_num;in++ )
-							{	inputValues.push_back( var[in] );	}
-								
-							double tmp_mva_value = MyMVA.GetMvaValue( inputValues );
-
-							//cout << tmp_mva_value << " ";
-							if( tmp_mva_value >= MAX_mva_value )
-							{
-								MAX_mva_value = tmp_mva_value;
-								mva_hadb = tmp_mva_hadb;
-								mva_j1 = tmp_mva_j1;
-								mva_j2 = tmp_mva_j2;
-								//cout << endl;
-							}
-						}
-					}
+				if(channel == "el")
+				{	
+					h_el.at(k)->Fill(had_t_mass,weight);
+					h_l_el.at(k)->Fill(lep_t_mass,weight);
 				}
-
-				if( mva_hadb == -1 || mva_j1 == -1 || mva_j2 == -1 )
-				{
-					cerr << "There is something wrong!" << endl;
-					continue;
-				}
-
-				h_max_mva[channel]->Fill( MAX_mva_value, weight );
-				
-				delete [] var;
-
-				//calculate the correctness of mva method
-
-				if( (mva_hadb == cor_b && mva_j1 == cor_j1 && mva_j2 == cor_j2) || (mva_hadb == cor_b && mva_j1 == cor_j2 && mva_j2 == cor_j1) )
-				{
-					cor_mva += weight;
-
-					if( channel == "mu" )
-					{	cor_mva_mu += weight;	}
-					else if( channel == "el" )
-					{	cor_mva_el += weight;	}
-
-					h_max_mva_cor[channel]->Fill( MAX_mva_value, weight );
-					h_max_mva_cor_t->Fill( MAX_mva_value, weight );
-					h_cor[channel]->Fill(1.,weight);
-					h_cor_t->Fill(1.,weight);
-				}
-				else
-				{
-					h_max_mva_incor[channel]->Fill( MAX_mva_value, weight );
-					h_max_mva_incor_t->Fill( MAX_mva_value, weight );
-				}
-
-				TLorentzVector p_mva_j1, p_mva_j2, p_mva_hadb;
-
-                p_mva_j1.SetPxPyPzE(jetInfo.Px[mva_j1],jetInfo.Py[mva_j1],jetInfo.Pz[mva_j1],jetInfo.Energy[mva_j1]);
-                p_mva_j2.SetPxPyPzE(jetInfo.Px[mva_j2],jetInfo.Py[mva_j2],jetInfo.Pz[mva_j2],jetInfo.Energy[mva_j2]);
-                p_mva_hadb.SetPxPyPzE(jetInfo.Px[mva_hadb],jetInfo.Py[mva_hadb],jetInfo.Pz[mva_hadb],jetInfo.Energy[mva_hadb]);
-				
-				double mva_tmass = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
-				
-				h_mvamax_mass[channel]->Fill( mva_tmass, MAX_mva_value, weight );
-				h_mvamax_mass_t->Fill( mva_tmass, MAX_mva_value, weight );
-
-/*				
-				//chi2 method
-				int chi2_hadb = -1, chi2_j1 = -1, chi2_j2 = -1;
-				double chi_square_value = Chi2_Sorting( jetInfo, sel_jets, sel_b_jets );
-
-				//calculate correctness of chi2 method
-				chi2_hadb = sel_b_jets.at(0);
-				chi2_j1 = sel_jets.at(0);
-				chi2_j2 = sel_jets.at(1);
-				
-				h_min_chi2[channel]->Fill( chi_square_value, weight );
-
-				if( (chi2_hadb == cor_b && chi2_j1 == cor_j1 && chi2_j2 == cor_j2) || (chi2_hadb == cor_b && chi2_j1 == cor_j2 && chi2_j2 == cor_j1) )
-				{
-					cor_chi2 += weight;
-					if( channel == "mu" )
-					{	cor_chi2_mu += weight;	}
-					else if( channel == "el" )
-					{	cor_chi2_el += weight;	}
-					h_min_chi2_cor[channel]->Fill( chi_square_value, weight );
-					h_min_chi2_cor_t->Fill( chi_square_value, weight );
-				}
-				else
-				{
-					h_min_chi2_incor[channel]->Fill( chi_square_value, weight );
-					h_min_chi2_incor_t->Fill( chi_square_value, weight );
-				}
-                
-				TLorentzVector p_chi2_j1, p_chi2_j2, p_chi2_hadb;
-
-				p_chi2_j1.SetPxPyPzE(jetInfo.Px[chi2_j1],jetInfo.Py[chi2_j1],jetInfo.Pz[chi2_j1],jetInfo.Energy[chi2_j1]);
-				p_chi2_j2.SetPxPyPzE(jetInfo.Px[chi2_j2],jetInfo.Py[chi2_j2],jetInfo.Pz[chi2_j2],jetInfo.Energy[chi2_j2]);
-				p_chi2_hadb.SetPxPyPzE(jetInfo.Px[chi2_hadb],jetInfo.Py[chi2_hadb],jetInfo.Pz[chi2_hadb],jetInfo.Energy[chi2_hadb]);
-
-				double chi2_tmass = ( p_chi2_j1 + p_chi2_j2 + p_chi2_hadb ).M();
-
-				h_chi2min_mass[channel]->Fill( chi2_tmass, chi_square_value, weight );
-*/
-
 
 			}	//end of entry for-loop	
+			cout << endl << "At Set " << Set_name << " " << r+1 << "'s end, (h_mu[0], h_TT_mu) = " << h_mu[0] << ", " << h_TT_mu << endl;
+			cout << endl << "The end of the file-sets " << Set_name << " " << r+1 << " " << endl;
+			
 		}	//end of r for-loop
 	}		//end of k for-loop
 
@@ -660,72 +550,69 @@ int test_count = 0;
 	
 	string time = "";
 	time = get_time_str( minute );
-	string new_file_name = "cor_mva_chi2_t11_BDTG_" + time + ".root";
+	string new_file_name = "SR_chi2_" + time + ".root";
 
-	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );	
+	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
 
-	h_max_mva_mu->Write();
-	h_max_mva_cor_mu->Write();
-	h_max_mva_incor_mu->Write();
-	
-	h_min_chi2_mu->Write();
-	h_min_chi2_cor_mu->Write();
-	h_min_chi2_incor_mu->Write();
+	h_TT_mu->Write();
+	h_DY_mu->Write();
+	h_WJets_mu->Write();
+	h_VV_mu->Write();
+	h_ST_mu->Write();
+	h_QCD_mu->Write();
 
-	h_max_mva_el->Write();
-	h_max_mva_cor_el->Write();
-	h_max_mva_incor_el->Write();
+	h_TT_el->Write();
+	h_DY_el->Write();
+	h_WJets_el->Write();
+	h_VV_el->Write();
+	h_ST_el->Write();
+	h_QCD_el->Write();
 	
-	h_min_chi2_el->Write();
-	h_min_chi2_cor_el->Write();
-	h_min_chi2_incor_el->Write();
-	
-	h_max_mva_cor_t->Write();
-	h_max_mva_incor_t->Write();
+	h_Data_mu->Write();
+	h_Data_el->Write();
 
-	h_min_chi2_cor_t->Write();
-	h_min_chi2_incor_t->Write();
+	h_l_TT_mu->Write();
+	h_l_DY_mu->Write();
+	h_l_WJets_mu->Write();
+	h_l_VV_mu->Write();
+	h_l_ST_mu->Write();
+	h_l_QCD_mu->Write();
+
+	h_l_TT_el->Write();
+	h_l_DY_el->Write();
+	h_l_WJets_el->Write();
+	h_l_VV_el->Write();
+	h_l_ST_el->Write();
+	h_l_QCD_el->Write();
 	
-	h_mvamax_mass_mu->Write();
-	h_mvamax_mass_el->Write();
-	h_mvamax_mass_t->Write();
+	h_l_Data_mu->Write();
+	h_l_Data_el->Write();
 
 	h_chi2min_mass_mu->Write();
 	h_chi2min_mass_el->Write();
 
-	h_cor_t->Write();
-	h_chosen_t->Write();
-	h_cor_mu->Write();
-	h_chosen_mu->Write();
-	h_cor_el->Write();
-	h_chosen_el->Write();
-	
-
 	f_out->Close();
 	delete f_out;
 
-
-	h_cor_t->Divide( h_chosen_t );
-	h_cor_mu->Divide( h_chosen_mu );
-	h_cor_el->Divide( h_chosen_el );
-
-
-	cout << "mis_sel ratio: " << (double)mis_sel/t_weight  << endl;
-	cout << "s_weight, s_weight_mu, s_weight_el = [ " << s_weight << ", " << s_weight_mu << ", " << s_weight_el << " ]" << endl << endl; 
-   	
-	cout << "cor_mva ratio : " << (double)cor_mva/s_weight << endl; 
-	cout << "Error : " << (double) h_cor_t->GetBinError(2) << endl; 	
-   	cout << "cor_mva_mu ratio : " << (double)cor_mva_mu/s_weight_mu << endl; 	
-	cout << "Error : " << (double) h_cor_mu->GetBinError(2) << endl; 	
-   	cout << "cor_mva_el ratio : " << (double)cor_mva_el/s_weight_el << endl; 	
-	cout << "Error : " << (double) h_cor_el->GetBinError(2) << endl << endl; 	
-
-	cout << "cor_chi2 ratio : " << (double)cor_chi2/s_weight << endl; 	
-   	cout << "cor_chi2_mu ratio : " << (double)cor_chi2_mu/s_weight_mu << endl; 	
-   	cout << "cor_chi2_el ratio : " << (double)cor_chi2_el/s_weight_el << endl; 	
-	
 	//*****make space free*****//
 	
+	delete h_TT_mu;
+	delete h_DY_mu;
+	delete h_WJets_mu;
+	delete h_VV_mu;
+	delete h_ST_mu;
+	delete h_QCD_mu;
+	
+	delete h_TT_el;
+	delete h_DY_el;
+	delete h_WJets_el;
+	delete h_VV_el;
+	delete h_ST_el;
+	delete h_QCD_el;
+	
+	delete h_Data_mu;
+	delete h_Data_el;
+
 	delete f7;
 	delete f6;
 	delete f5;

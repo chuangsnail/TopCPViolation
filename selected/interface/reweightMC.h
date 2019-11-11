@@ -37,7 +37,8 @@ public:
 	
     JetInfo* jets;
 
-	map<BTagEntry::OperatingPoint, BTagCalibrationReader> map_b, map_c, map_l;
+	//map<BTagEntry::OperatingPoint, BTagCalibrationReader> map_b, map_c, map_l;
+	map<BTagEntry::OperatingPoint, BTagCalibrationReader> map_;
 
 	BTagEntry::OperatingPoint op;			//this is the case for all with the same operating point
 	
@@ -153,7 +154,7 @@ double Get_JERScale( JetInfo& jets, const int& i )
 	return scale;
 }
 
-//it can change the jets' Pt/Eta/Phi/P4...(kinematic)
+//it can change the jets' Pt/P4...(kinematic) //but Eta/Phi can't be change (just change energy not aspection)
 void JERCor( JetInfo& jets )
 {
 	for(int i=0;i<jets.Size;++i)

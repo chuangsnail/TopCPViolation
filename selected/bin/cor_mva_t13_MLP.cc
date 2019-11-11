@@ -428,7 +428,7 @@ int main(int argc,char* argv[])
 				
 
 				//luminosity cali after trigger
-
+/*
 				if(!is_data)
 				{
 					if(channel == "mu")
@@ -436,12 +436,7 @@ int main(int argc,char* argv[])
 					if(channel == "el")
 					{	weight *= lumi_cali_trg(35.615/35.9);	}
 				}
-				
-				//JER
-				if( !is_data )
-				{
-					JERCor( jetInfo );
-				}
+*/				
 
 
 				//Then ,do the jet-selection here

@@ -1,0 +1,104 @@
+
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT50to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 4180469
+GetEntries() : 4180469
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WW_TuneCUETP8M1_13TeV-pythia8/*.root gen number (with secondary correction) : 6988168
+GetEntries() : 6988168
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 9388811
+GetEntries() : 9388811
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WZ_TuneCUETP8M1_13TeV-pythia8/*.root gen number (with secondary correction) : 2997571
+GetEntries() : 2997571
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 10020533
+GetEntries() : 10020533
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/ZZ_TuneCUETP8M1_13TeV-pythia8/*.root gen number (with secondary correction) : 998034
+GetEntries() : 998034
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 8265899
+GetEntries() : 8265899
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/ST_s-channel_4f_leptonDecays_TuneCP5_PSweights_13TeV-amcatnlo-pythia8/*.root gen number (with secondary correction) : 6137801
+GetEntries() : 9842599
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 8646942
+GetEntries() : 8646942
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 8527128
+GetEntries() : 8527128
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 38593839
+GetEntries() : 38593839
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 8233247
+GetEntries() : 8233247
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 2673066
+GetEntries() : 2673066
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 596079
+GetEntries() : 596079
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/DYJetsToLL_M-50_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 399492
+GetEntries() : 399492
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root gen number (with secondary correction) : 17780700
+GetEntries() : 17780700
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 19914590
+GetEntries() : 19914590
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 5796237
+GetEntries() : 5796237
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 82293477
+GetEntries() : 82293477
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 14908339
+GetEntries() : 14908339
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 6286023
+GetEntries() : 6286023
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 6677967
+GetEntries() : 6677967
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 2384260
+GetEntries() : 2384260
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 38857977
+GetEntries() : 38857977
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root gen number (with secondary correction) : 106736180
+GetEntries() : 107604800
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 37516961
+GetEntries() : 37516961
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/*.root gen number (with secondary correction) : 67105876
+GetEntries() : 67105876
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root gen number (with secondary correction) : 4942374
+GetEntries() : 4980600
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/ST_tW_top_5f_inclusiveDecays_TuneCP5_PSweights_13TeV-powheg-pythia8/*.root gen number (with secondary correction) : 4945734
+GetEntries() : 4983500
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 44061488
+GetEntries() : 44061488
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 21604533
+GetEntries() : 21604533
+
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 10286971
+GetEntries() : 10286971
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 7868538
+GetEntries() : 7868538
+File_name:
+/wk_cms2/youying/public/bprimekit_2016_Legacy/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/*.root gen number (with secondary correction) : 4027896
+GetEntries() : 4027896

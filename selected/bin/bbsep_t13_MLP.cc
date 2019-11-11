@@ -462,11 +462,6 @@ int test_count = 0;
 					{	weight *= lumi_cali_trg(35.615/35.9);	}
 				}
 
-				//JER
-				if( !is_data )
-				{
-					JERCor( jetInfo );
-				}
 				//Then ,do the jet-selection here
 				bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);
 
@@ -539,7 +534,7 @@ int test_count = 0;
 
 
 				int mva_hadb = -1, mva_j1 = -1, mva_j2 = -1;
-				
+				int mva_lepb = -1 ;
 				int var_num = 8;
 				double* var = new double[var_num];
 				double max_mva_value = -1.;				//ANN's value is 0~1
@@ -594,11 +589,10 @@ int test_count = 0;
 
 				h_max_mva[channel]->Fill( max_mva_value, weight );
 				
-				delete var;
+				delete [] var;
 
 				//calculate the correctness of mva method
 
-				int mva_lepb = -1;
 				mva_lepb = ( mva_hadb == sel_b_jets.at(0) ) ? sel_b_jets.at(1) : sel_b_jets.at(0) ;
 
 				TLorentzVector p_mva_j1, p_mva_j2, p_mva_hadb, p_mva_lepb, p_mva_lepton;

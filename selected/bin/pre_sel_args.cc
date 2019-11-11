@@ -16,6 +16,7 @@
 #include "TopCPViolation/selected/interface/lep_sel.h"
 #include "TopCPViolation/selected/interface/jet_sel.h"
 #include "TopCPViolation/selected/interface/checkEvtTool.h"		//for Golden Json file
+#include "TopCPViolation/selected/interface/reweightMC.h"
 
 #include "TFile.h"
 #include "TChain.h"
@@ -51,7 +52,8 @@ int main(int argc, char* argv[])
 	{	cout << endl << "This dataset is MC " << endl;	}
 
 
-	TChain* root = new TChain( "bprimeKit/root" );
+	//TChain* root = new TChain( "bprimeKit/root" );	//use original file to pre-sel
+	TChain* root = new TChain( "root" );				//use dbl pre-sel file to pre-sel
     //root->Add("/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_001/bpk_ntuple_*.root");
 
 	//To capture original files' name
@@ -67,7 +69,7 @@ int main(int argc, char* argv[])
 
 	//To make the output files' name
 
-	char path_filename[500] = "/wk_cms2/cychuang/2016legacy_pre_sel_file/";
+	char path_filename[500] = "/wk_cms2/cychuang/pre_sel_file_2016legacy/";
 	strcat(path_filename,argv[2]);
 	char temp_path_filename[500];
 	strcpy( temp_path_filename, path_filename );
@@ -94,7 +96,7 @@ int main(int argc, char* argv[])
 
 	//This is the official Golden json file
 	checkEvtTool checkEvt_all;
-	checkEvt_all.addJson( "/wk_cms2/cychuang/CMSSW_8_0_19/src/TopCPViolation/data/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt" );
+	checkEvt_all.addJson( "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt" );
 	checkEvt_all.makeJsonMap();
 
 
@@ -208,7 +210,14 @@ int main(int argc, char* argv[])
 			}
 			else
 			{	continue;	}
-			
+
+/*			
+			if( !is_data )
+			{
+				JERCor( jets );
+			}
+*/
+
         	bool pass_sel_jet = Pass_SR_Selected_Jets_Case( jets, sel_jets );
 			if( !pass_sel_jet )
 			{	continue;	}

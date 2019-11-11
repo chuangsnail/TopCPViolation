@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
 	double y_QCD_mu = h_QCD_mu->Integral(1,51);
 	double y_Data_mu = h_Data_mu->Integral(1,51);
 
-	double y_total_el = y_TT_el + y_DY_el + y_WJets_el + y_VV_el + y_ST_el;
-	double y_total_mu = y_TT_mu + y_DY_mu + y_WJets_mu + y_VV_mu + y_ST_mu;
+	double y_total_el = y_TT_el + y_DY_el + y_WJets_el + y_VV_el + y_ST_el + y_QCD_el;
+	double y_total_mu = y_TT_mu + y_DY_mu + y_WJets_mu + y_VV_mu + y_ST_mu + y_QCD_mu;
 
 	cout << "\n-----Muon Channel-----" << endl;
 	cout << "total Data yields : " << y_Data_mu << endl;
@@ -86,9 +86,9 @@ int main(int argc, char* argv[])
 	
 
 	cout << endl;
-	cout << "ch      TT   " << "    DY    " << "   WJets   " << "    VV    " << "    ST    " << endl;
+	cout << "ch      TT   " << "    DY    " << "   WJets   " << "    VV    " << "    ST    " << "   QCD   " << endl;
 	cout << "Mu  " << y_TT_el/y_total_el << " " << y_DY_el/y_total_el << " " << y_WJets_el/y_total_el << " " << y_VV_el/y_total_el \
-		<< " " << y_ST_el/y_total_el << endl;
+		<< " " << y_ST_el/y_total_el << " " << y_QCD_el/y_total_el << endl;
 	cout << "El  " << y_TT_mu/y_total_mu << " " << y_DY_mu/y_total_mu << " " << y_WJets_mu/y_total_mu << " " << y_VV_mu/y_total_mu \
-		<< " " << y_ST_mu/y_total_mu << endl;
+		<< " " << y_ST_mu/y_total_mu << " " << y_QCD_mu/y_total_mu << endl;
 }

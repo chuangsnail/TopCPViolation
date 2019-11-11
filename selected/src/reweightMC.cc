@@ -7,6 +7,7 @@
 #include "TTree.h"
 #include "TChain.h"
 #include "TH1.h"
+#include "TObject.h"	//SetName() GetName() ...  
 
 #include "CondFormats/BTauObjects/interface/BTagCalibration.h"
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
@@ -108,6 +109,7 @@ void BtagManager::Set_OP( BTagEntry::OperatingPoint o )
 	op = o;
 }
 
+/*
 double BtagManager::Get_Btag_Scale_Factor( const int idx )
 {
 	BTagEntry::JetFlavor flavor;
@@ -121,6 +123,21 @@ double BtagManager::Get_Btag_Scale_Factor( const int idx )
 	{	flavor = BTagEntry::FLAV_UDSG;	map = &map_l;	}
 
 	return map->at( op ).eval_auto_bounds( "central", flavor, jets->Eta[idx], jets->Pt[idx] );
+}
+*/
+
+double BtagManager::Get_Btag_Scale_Factor( const int idx )
+{
+	BTagEntry::JetFlavor flavor;
+
+	if( fabs( jets->GenFlavor[idx] ) == 5 )
+	{	flavor = BTagEntry::FLAV_B;	}
+	else if( fabs( jets->GenFlavor[idx] ) == 4 )
+	{	flavor = BTagEntry::FLAV_C;	}
+	else
+	{	flavor = BTagEntry::FLAV_UDSG; }
+
+	return map_.at( op ).eval_auto_bounds( "central", flavor, jets->Eta[idx], jets->Pt[idx] );
 }
 
 double BtagManager::Get_Btag_Efficiency(  const int idx )
@@ -144,7 +161,7 @@ double BtagManager::Get_Btag_Efficiency(  const int idx )
 	}	
 }
 
-
+/*
 void BtagManager::Register_Init_Maps()
 {
 	string tagger = "bcheck";
@@ -162,6 +179,23 @@ void BtagManager::Register_Init_Maps()
 		map_c[ BTagEntry::OperatingPoint( i ) ].load( *_calib2, BTagEntry::FLAV_C, "comb" );
 		map_l[ BTagEntry::OperatingPoint( i ) ] = BTagCalibrationReader( BTagEntry::OperatingPoint( i ), "central", {"up","down"} );
 		map_l[ BTagEntry::OperatingPoint( i ) ].load( *_calib3, BTagEntry::FLAV_UDSG, "incl" );
+	}
+}
+*/
+
+void BtagManager::Register_Init_Maps()
+{
+	string tagger = "bcheck";
+	string filename = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/DeepCSV_2016LegacySF_V1.csv";
+
+	BTagCalibration* _calib = new BTagCalibration( tagger , filename );
+
+	for(int i=BTagEntry::OP_LOOSE;i!=BTagEntry::OP_RESHAPING;++i)
+	{
+		map_[ BTagEntry::OperatingPoint( i ) ] = BTagCalibrationReader( BTagEntry::OperatingPoint( i ), "central", {"up","down"} );
+		map_[ BTagEntry::OperatingPoint( i ) ].load( *_calib, BTagEntry::FLAV_B, "comb" );
+		map_[ BTagEntry::OperatingPoint( i ) ].load( *_calib, BTagEntry::FLAV_C, "comb" );
+		map_[ BTagEntry::OperatingPoint( i ) ].load( *_calib, BTagEntry::FLAV_UDSG, "incl" );
 	}
 }
 
@@ -224,7 +258,7 @@ void BtagManager::Set_b_ntagged_jets_idx( vector<int>& sel_jets )
 double BtagManager::Get_Btag_Weight()
 {
 	double prob_div = 1.;
-	if( (int)tagged_b.size() != 0 )
+	if( !tagged_b.empty() )
 	{
 		for(int i=0;i<(int)tagged_b.size();i++)
 		{	
@@ -234,7 +268,7 @@ double BtagManager::Get_Btag_Weight()
 		}
 	}
 	
-	if( (int)ntagged_b.size() != 0 )
+	if( !ntagged_b.empty() )
 	{
 		for(int i=0;i<(int)ntagged_b.size();i++)
 		{
@@ -251,16 +285,17 @@ double BtagManager::Get_Btag_Weight()
 }
 
 //GetName() is in TObject class
-TH1F* DataDriven( const string& filename, const string& h_name, TH1F* h_re )
+TH1F* DataDriven( const string& filename, const string& data_name, TH1F* h_re )
 {
 	double evt_no_re = h_re->Integral(1,(int)h_re->GetXaxis()->GetNbins()+1);
-	TH1F* h_data = new TH1F(h_re->GetName(),"",(int)h_re->GetXaxis()->GetNbins(),(double)h_re->GetXaxis()->GetXmin(),(double)h_re->GetXaxis()->GetXmax());
+	TH1F* h_new = new TH1F(h_re->GetName(),"",(int)h_re->GetXaxis()->GetNbins(),(double)h_re->GetXaxis()->GetXmin(),(double)h_re->GetXaxis()->GetXmax());
 	TFile* f = new TFile( filename.c_str() );
-	f->GetObject( h_name.c_str() , h_data );
+	f->GetObject( data_name.c_str() , h_new );
 
-	double evt_no_data = h_data->Integral(1,(int)h_data->GetXaxis()->GetNbins()+1);
-	h_data->Scale( evt_no_re/evt_no_data );
-	return h_data;
+	double evt_no_data = h_new->Integral(1,(int)h_new->GetXaxis()->GetNbins()+1);
+	h_new->Scale( evt_no_re/evt_no_data );
+	h_new->SetName( h_re->GetName() );
+	return h_new;
 }
 
 

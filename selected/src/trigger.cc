@@ -7,8 +7,15 @@ void Get_HLT_Info( string key, vector<int>& HLT_info )
 	vector<int> info;	
 	if(key == "MC_mu")
 	{
+
 		info.push_back( 1319 );
-		info.push_back( 2415 );			
+		info.push_back( 2415 );
+/*		
+		info.push_back( 2412 );
+		info.push_back( 2413 );
+		info.push_back( 2414 );
+		info.push_back( 2415 );
+*/
 	}
 	else if(key == "Data_mu")
 	{
@@ -22,15 +29,24 @@ void Get_HLT_Info( string key, vector<int>& HLT_info )
 		info.push_back( 1322 );	
 		info.push_back( 1323 );	
 		info.push_back( 1324 );
-
+///*
 		info.push_back( 2412 );			
 		info.push_back( 2413 );			
 		info.push_back( 2414 );			
-		info.push_back( 2415 );			
+		info.push_back( 2415 );	
+//*/		
 	}
 	else if(key == "MC_el")
 	{
-		info.push_back( 923 );				
+
+		info.push_back( 923 );	
+		
+/*		
+		info.push_back( 2412 );
+		info.push_back( 2413 );
+		info.push_back( 2414 );
+		info.push_back( 2415 );
+*/
 	}
 	else if(key == "Data_el")
 	{
@@ -68,5 +84,22 @@ bool Pass_HLT( TrgInfo& trg, const vector<int>& HLT_info )
 double lumi_cali_trg(double frac)
 {
 	return frac;
+}
+
+
+//if there is a calibration on luminosity when apply trigger
+
+double trigger_calib( const string& channel )
+{
+	double calib = 1.;
+	if( channel == "el" )
+	{
+		//calib *= 35.615/35.9;
+	}
+	else if( channel == "mu" )
+	{
+		//calib *= 35.811/35.9;
+	}
+	return calib;
 }
 

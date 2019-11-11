@@ -17,4 +17,6 @@ bool Pass_HLT( TrgInfo& evt, const vector<int>& HLT_info );
 
 double lumi_cali_trg(double frac);
 
+double trigger_calib( const string& channel = "no_calib" );
+
 #endif
