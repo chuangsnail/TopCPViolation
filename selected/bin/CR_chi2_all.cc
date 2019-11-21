@@ -473,7 +473,7 @@ int main(int argc,char* argv[])
 
 	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
 
-	hists.WriteIn("OneCut");
+	hists.WriteIn("1C");
 
 	h_chi2min_mass_mu->Write();
 	h_chi2min_mass_el->Write();

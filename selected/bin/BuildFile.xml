@@ -18,22 +18,16 @@
 <bin name="cor_mva_t11_MLP"  file="cor_mva_t11_MLP.cc"/>
 <bin name="cor_mva_t13_MLP"  file="cor_mva_t13_MLP.cc"/>
 <bin name="bbsep_t11_MLP"  file="bbsep_t11_MLP.cc"/>
-<bin name="bbsep_t11_BDT"  file="bbsep_t11_BDT.cc"/>
-<bin name="bbsep_t11_BDTG"  file="bbsep_t11_BDTG.cc"/>
 <bin name="bbsep_t13_MLP"  file="bbsep_t13_MLP.cc"/>
-<bin name="bbsep_t13_BDT"  file="bbsep_t13_BDT.cc"/>
-<bin name="bbsep_t13_BDTG"  file="bbsep_t13_BDTG.cc"/>
 <bin name="st08_mva"  file="store_candidate_tree8.cc"/>
 <bin name="cor_mva_t11_BDT"  file="cor_mva_t11_BDT.cc"/>
 <bin name="cor_mva_t11_BDTG"  file="cor_mva_t11_BDTG.cc"/>
 <bin name="cor_mva_t13_BDT"  file="cor_mva_t13_BDT.cc"/>
 <bin name="cor_mva_t13_BDTG"  file="cor_mva_t13_BDTG.cc"/>
 <bin name="bbsep_chi2"  file="bbsep_chi2.cc"/>
-<bin name="plot_HadTop"  file="plot_HadTop_DataMC.cc"/>
+<bin name="plot_Mass"  file="plot_Mass.cc"/>
 <bin name="plot_LepTop"  file="plot_LepTop_DataMC.cc"/>
 <bin name="SR_chi2"  file="SR_chi2.cc"/>
-<bin name="cor_t16_MLP"  file="cor_t16_MLP.cc"/>
-<bin name="bbsep_t16_MLP"  file="bbsep_t16_MLP.cc"/>
 <bin name="test_new"  file="test_new_frame.cc"/>
 <bin name="SR_t11_MLP_all"  file="SR_t11_MLP_all.cc"/>
 <bin name="SR_t13_MLP_all"  file="SR_t13_MLP_all.cc"/>
@@ -43,5 +37,11 @@
 <bin name="CR_t13_MLP_all"  file="CR_t13_MLP_all.cc"/>
 <bin name="SR_t13_MLP_new"  file="SR_t13_MLP_new.cc"/>
 <bin name="CR_chi2_all"  file="CR_chi2_all.cc"/>
+<bin name="SR_chi2_all"  file="SR_chi2_all.cc"/>
+<bin name="cor_t16_MLP"  file="cor_t16_MLP.cc"/>
+<bin name="bbsep_t16_MLP"  file="bbsep_t16_MLP.cc"/>
+<bin name="SR_t16_MLP_all"  file="SR_t16_MLP_all.cc"/>
+<bin name="CR_t16_MLP_all"  file="CR_t16_MLP_all.cc"/>
+<bin name="CR_t16_MLP_inv"  file="CR_t16_MLP_inv.cc"/>
 
 
