@@ -12,6 +12,8 @@
 #include "TopCPViolation/prepare_info/interface/about_time.h"
 #include "TopCPViolation/selected/interface/dataset.h"
 #include "TopCPViolation/selected/interface/trigger.h"
+#include "TopCPViolation/selected/interface/Hists.h"
+
 
 #include <iostream>
 #include <map>

@@ -12,6 +12,7 @@ void Hists::GetObjs( string& file_name, string& option )
 {
 	TFile* f = new TFile( (char*)file_name.c_str() );
 	
+
 	if( option.find("NC") != string::npos )
 	{
 		h_TT_mu = new TH1F();		h_TT_el = new TH1F();
@@ -250,10 +251,15 @@ void Hists::TH2ModeON( const int& algo_bins_No, const double& m, const double& M
 {
 	double algo_v_min = m;
 	double algo_v_max = M;
-	h_mvamax_mass_mu = new TH2D("h_mvamax_mass_mu","",bins_No,hist_min,hist_max,algo_bins_No,algo_v_min,algo_v_max);
-	h_mvamax_mass_el = new TH2D("h_mvamax_mass_el","",bins_No,hist_min,hist_max,algo_bins_No,algo_v_min,algo_v_max);
-	h_mvamax_mass[ "mu" ] = h_mvamax_mass_mu;			
-	h_mvamax_mass[ "el" ] = h_mvamax_mass_el;
+	h_mvamax_hadmass_mu = new TH2D("h_mvamax_hadmass_mu","",bins_No,hist_min,hist_max,algo_bins_No,algo_v_min,algo_v_max);
+	h_mvamax_hadmass_el = new TH2D("h_mvamax_hadmass_el","",bins_No,hist_min,hist_max,algo_bins_No,algo_v_min,algo_v_max);
+	h_mvamax_hadmass[ "mu" ] = h_mvamax_hadmass_mu;			
+	h_mvamax_hadmass[ "el" ] = h_mvamax_hadmass_el;
+	
+	h_mvamax_lepmass_mu = new TH2D("h_mvamax_lepmass_mu","",bins_No,hist_min,hist_max,algo_bins_No,algo_v_min,algo_v_max);
+	h_mvamax_lepmass_el = new TH2D("h_mvamax_lepmass_el","",bins_No,hist_min,hist_max,algo_bins_No,algo_v_min,algo_v_max);
+	h_mvamax_lepmass[ "mu" ] = h_mvamax_lepmass_mu;			
+	h_mvamax_lepmass[ "el" ] = h_mvamax_lepmass_el;
 }
 void Hists::NoCutModeON()
 {
@@ -398,6 +404,11 @@ void Hists::TwoCutModeON()
 
 void Hists::WriteIn( const string& option = "NC" )
 {
+	if( option.find("NT") != string::npos )
+	{
+		mvav_mass_mu->Write();
+		mvav_mass_el->Write();
+	}
 	if( option.find("NC") != string::npos )
 	{
 		h_TT_mu->Write();		
@@ -504,3 +515,136 @@ void Hists::WriteIn( const string& option = "NC" )
 	}
 
 }
+
+void
+Hists_bb::Init()
+{
+	//we want the binNo at had t mass is same as the mva values'
+	h_mvamax_mass_mu = new TH2D("h_mvamax_mass_mu","",bins_No1,hist_min2,hist_max2,bins_No1,hist_min1,hist_max1);
+	h_mvamax_mass_el = new TH2D("h_mvamax_mass_el","",bins_No1,hist_min2,hist_max2,bins_No1,hist_min1,hist_max1);
+	h_mvamax_mass_t = new TH2D("h_mvamax_mass_t","",bins_No1,hist_min2,hist_max2,bins_No1,hist_min1,hist_max1);
+	h_mvamax_mass[ "mu" ] = h_mvamax_mass_mu;			h_mvamax_mass[ "el" ] = h_mvamax_mass_el;
+	
+	h_correct_t = new TH1F("h_correct_t"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	h_mistag_t = new TH1F("h_mistag_t"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	h_charge_mis_t = new TH1F("h_charge_mis_t"," ;mva value;events",bins_No1,hist_min1,hist_max1); 
+
+	h_correct_mu = new TH1F("h_correct_mu"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	h_mistag_mu = new TH1F("h_mistag_mu"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	h_charge_mis_mu = new TH1F("h_charge_mis_mu"," ;mva value;events",bins_No1,hist_min1,hist_max1); 
+	h_correct_el = new TH1F("h_correct_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	h_mistag_el = new TH1F("h_mistag_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	h_charge_mis_el = new TH1F("h_charge_mis_el"," ;mva value;events",bins_No1,hist_min1,hist_max1);
+	
+
+	h_lt_correct_t = new TH1F("h_lt_correct_t"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	h_lt_mistag_t = new TH1F("h_lt_mistag_t"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	h_lt_charge_mis_t = new TH1F("h_lt_charge_mis_t"," ;mass;events",bins_No2,hist_min2,hist_max2); 
+	
+	h_lt_correct_mu = new TH1F("h_lt_correct_mu"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	h_lt_mistag_mu = new TH1F("h_lt_mistag_mu"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	h_lt_charge_mis_mu = new TH1F("h_lt_charge_mis_mu"," ;mass;events",bins_No2,hist_min2,hist_max2); 
+	h_lt_correct_el = new TH1F("h_lt_correct_el"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	h_lt_mistag_el = new TH1F("h_lt_mistag_el"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	h_lt_charge_mis_el = new TH1F("h_lt_charge_mis_el"," ;mass;events",bins_No2,hist_min2,hist_max2);
+	
+	
+	h_correct[ "mu" ] = h_correct_mu;			h_correct[ "el" ] = h_correct_el;
+	h_charge_mis[ "mu" ] = h_charge_mis_mu;		h_charge_mis[ "el" ] = h_charge_mis_el;
+	h_mistag[ "mu" ] = h_mistag_mu;				h_mistag[ "el" ] = h_mistag_el;
+	h_lt_correct[ "mu" ] = h_lt_correct_mu;				h_lt_correct[ "el" ] = h_lt_correct_el;
+	h_lt_charge_mis[ "mu" ] = h_lt_charge_mis_mu;		h_lt_charge_mis[ "el" ] = h_lt_charge_mis_el;
+	h_lt_mistag[ "mu" ] = h_lt_mistag_mu;				h_lt_mistag[ "el" ] = h_lt_mistag_el;
+}
+
+void
+Hists_bb::WriteIn()
+{
+	
+	h_mvamax_mass_mu->Write();
+	h_mvamax_mass_el->Write();
+	h_mvamax_mass_t->Write();
+
+	h_correct_t->Write();
+	h_mistag_t->Write();
+	h_charge_mis_t->Write();
+
+	h_correct_mu->Write();
+	h_mistag_mu->Write();
+	h_charge_mis_mu->Write();
+
+	h_correct_el->Write();
+	h_mistag_el->Write();
+	h_charge_mis_el->Write();
+
+	h_lt_correct_t->Write();
+	h_lt_mistag_t->Write();
+	h_lt_charge_mis_t->Write();
+
+	h_lt_correct_mu->Write();
+	h_lt_mistag_mu->Write();
+	h_lt_charge_mis_mu->Write();
+
+	h_lt_correct_el->Write();
+	h_lt_mistag_el->Write();
+	h_lt_charge_mis_el->Write();
+}
+
+
+void Hists_cor::Init()
+{
+	h_max_mva_mu = new TH1F("h_max_mva_mu","",bins_No1,hist_min1,hist_max1);
+	h_max_mva_cor_mu = new TH1F("h_max_mva_cor_mu","",bins_No1,hist_min1,hist_max1);
+	h_max_mva_incor_mu = new TH1F("h_max_mva_incor_mu","",bins_No1,hist_min1,hist_max1);
+	
+	h_max_mva_el = new TH1F("h_max_mva_el","",bins_No1,hist_min1,hist_max1);
+	h_max_mva_cor_el = new TH1F("h_max_mva_cor_el","",bins_No1,hist_min1,hist_max1);
+	h_max_mva_incor_el = new TH1F("h_max_mva_incor_el","",bins_No1,hist_min1,hist_max1);
+	
+	h_max_mva_t = new TH1F("h_max_mva_t","",bins_No1,hist_min1,hist_max1);
+	h_max_mva_cor_t = new TH1F( "h_max_mva_cor_t","",bins_No1,hist_min1,hist_max1);
+	h_max_mva_incor_t = new TH1F( "h_max_mva_incor_t","",bins_No1,hist_min1,hist_max1);
+	
+	h_max_mva[ "mu" ] = h_max_mva_mu;					h_max_mva[ "el" ] = h_max_mva_el;
+	h_max_mva_cor[ "mu" ] = h_max_mva_cor_mu;			h_max_mva_cor[ "el" ] = h_max_mva_cor_el;
+	h_max_mva_incor[ "mu" ] = h_max_mva_incor_mu;		h_max_mva_incor[ "el" ] = h_max_mva_incor_el;
+	
+
+	h_chosen_mu = new TH1F( "h_chosen_mu","",2,0.,2. );
+	h_cor_mu = new TH1F( "h_cor_mu","",2,0.,2. );
+
+	h_chosen_el = new TH1F( "h_chosen_el","",2,0.,2. );
+	h_cor_el = new TH1F( "h_cor_el","",2,0.,2. );
+	
+	h_chosen_t = new TH1F( "h_chosen","",2,0.,2. );
+	h_cor_t = new TH1F( "h_cor","",2,0.,2. );
+
+	h_chosen[ "mu" ] = h_chosen_mu;		h_chosen[ "el" ] = h_chosen_el;
+	h_cor[ "mu" ] = h_cor_mu;			h_cor[ "el" ] = h_cor_el;
+}
+
+
+void Hists_cor::WriteIn()
+{
+	h_max_mva_mu->Write();
+	h_max_mva_cor_mu->Write();
+	h_max_mva_incor_mu->Write();
+		
+	h_max_mva_el->Write();
+	h_max_mva_cor_el->Write();
+	h_max_mva_incor_el->Write();
+
+	h_max_mva_t->Write();
+	h_max_mva_cor_t->Write();
+	h_max_mva_incor_t->Write();
+	
+	h_chosen_mu->Write();
+	h_cor_mu->Write();
+		
+	h_chosen_el->Write();
+	h_cor_el->Write();
+	
+	h_chosen_t->Write();
+	h_cor_t->Write();
+}
+

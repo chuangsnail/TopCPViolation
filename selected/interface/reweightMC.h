@@ -199,5 +199,6 @@ public:
 
 TH1F* DataDriven( const string& filename, const string& h_name, TH1F* h_re );
 
+TH1F* Data_Driven( TH1F* h_data, TH1F* h_re );
 #endif
 

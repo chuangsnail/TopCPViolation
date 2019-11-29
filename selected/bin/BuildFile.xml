@@ -43,5 +43,11 @@
 <bin name="SR_t16_MLP_all"  file="SR_t16_MLP_all.cc"/>
 <bin name="CR_t16_MLP_all"  file="CR_t16_MLP_all.cc"/>
 <bin name="CR_t16_MLP_inv"  file="CR_t16_MLP_inv.cc"/>
-
+<bin name="st09_mva"  file="store_candidate_tree9.cc"/>
+<bin name="st10_mva"  file="store_candidate_tree10.cc"/>
+<bin name="corbb_t20_10_MLP"  file="cor_bbsep_t20_10_MLP.cc"/>
+<bin name="corbb_tp"  file="corbb_template.cc"/>
+<bin name="SR_tp"  file="SR_template.cc"/>
+<bin name="CR_tp"  file="CR_template.cc"/>
+<bin name="CR_inv_tp"  file="CR_inv_template.cc"/>
 

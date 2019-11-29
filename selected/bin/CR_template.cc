@@ -1,19 +1,25 @@
 /**************************************************************************************
  *
- *	File Name : SR_t13_MLP_all.cc
+ *	File Name : CR_t20_10_MLP_all.cc
  *	Description : use new hists object to store histagrams.
  *	Date : 191112~
  *	Author : Chen-Yu Chuang
  *
  ****************************************************************************************/
 #include "TopCPViolation/selected/interface/Comp_DataMC.h"
-#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_13/weights/TMVAClassification_MLP.class.C"
+#include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_19/weights/TMVAClassification_MLP.class.C"
 #include "TopCPViolation/selected/interface/Hists.h"
+#include "TopCPViolation/selected/interface/MVAvar.h"
 
 using namespace std;
+using namespace mvatool;
 
 int main(int argc,char* argv[])
 {
+	double mva_cut = 0.2;
+	string training_name = "t19_MLP";
+	string inv_name = "CR_inv_t19_MLP_191129_0546.root";				//invIso used to Data-driven QCD,need to do the inv first
+
 	string data_sets_name[7] = {"TT","DY","WJets","VV","ST","QCD","Data"};
 	string d6 = data_sets_name[6] + "_SM";
 	string d7 = data_sets_name[6] + "_SE";
@@ -78,6 +84,15 @@ int main(int argc,char* argv[])
 	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_TTbar_0pt6321.root");
 	f7->GetObject( "eff_b", eff_b );	f7->GetObject( "eff_c", eff_c );	f7->GetObject( "eff_l", eff_l );
 
+	TH1F* h_data_dd_mu;		TH1F* h_data_dd_el;
+	TH1F* h_l_data_dd_mu;	TH1F* h_l_data_dd_el;
+	string inv_path_name = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/" + inv_name;
+	TFile* f_dd = new TFile( (char*)inv_path_name.c_str() );
+	f_dd->GetObject( "h_Data_mu", h_data_dd_mu );
+	f_dd->GetObject( "h_Data_el", h_data_dd_el );
+	f_dd->GetObject( "h_l_Data_mu", h_l_data_dd_mu );
+	f_dd->GetObject( "h_l_Data_el", h_l_data_dd_el );
+
 	//**********initial the files and TChain and make the file map and weight map***********//
 
 	map< string , vector<File>* > files_map;
@@ -125,25 +140,18 @@ int main(int argc,char* argv[])
 	//******prepare mva object******//
 	
 	vector<string> inputVars;
-	inputVars.push_back( "top_mass" );
-	inputVars.push_back( "w_mass" );
 	
-	inputVars.push_back("j1j2_sumPt");
-	inputVars.push_back("j1j2_absdelEta");
-	inputVars.push_back("j1j2_delPhi");
-	inputVars.push_back("lepblep_sumPt");
-	inputVars.push_back("lepblep_absdelEta");
-	inputVars.push_back("lepblep_delPhi");
+	AddVarName( inputVars );
 
 	ReadMLP MyMVA( inputVars );
 
 	//**********************Start Analysis***********************//
-	
+
 	//**************** open the file we want to store the result **********************************//
 
 	string time_str = "";
 	time_str = get_time_str( minute );
-	string new_file_name = string(argv[0]) +"_" + time_str + ".root";
+	string new_file_name = string("CR_") + training_name +"_" + time_str + ".root";
 
 	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
 	//initialize ntuple must be after the initialization of the TFile
@@ -222,6 +230,7 @@ int main(int argc,char* argv[])
 			BtagManager bmgr( &jetInfo );
 			bmgr.Register_Init_Maps();
 			bmgr.Register_Init_TH2( eff_b, eff_c, eff_l );
+			bmgr.Set_OP( BTagEntry::OP_LOOSE );
 		
 			int u = 1;	
 			for(int entry=0;entry<(int)t_entries;++entry)
@@ -267,21 +276,21 @@ int main(int argc,char* argv[])
 			
 				//Do the lepton-selection first here
 				
-				bool pass_sel_mu = Pass_SR_Selected_Muon(leptonInfo,idx_Selected_Mu);
-				bool pass_sel_el = Pass_SR_Selected_Electron(leptonInfo,idx_Selected_El);
+				bool pass_sel_mu = Pass_CR_Selected_Muon(leptonInfo,idx_Selected_Mu);
+				bool pass_sel_el = Pass_CR_Selected_Electron(leptonInfo,idx_Selected_El,evtInfo);
 				bool pass_veto_el = false;		bool pass_veto_mu = false;
 
 				if( (pass_sel_mu||pass_sel_el) && !(pass_sel_mu&&pass_sel_el) )
 				{
 					if(pass_sel_mu)
 					{
-						pass_veto_el = Pass_SR_Veto_Electron(leptonInfo,idx_Selected_Mu);
-						pass_veto_mu = Pass_SR_Veto_Muon(leptonInfo,idx_Selected_Mu);
+						pass_veto_el = Pass_CR_Veto_Electron(leptonInfo,idx_Selected_Mu,evtInfo);
+						pass_veto_mu = Pass_CR_Veto_Muon(leptonInfo,idx_Selected_Mu);
 					}
 					if(pass_sel_el)
 					{
-						pass_veto_el = Pass_SR_Veto_Electron(leptonInfo,idx_Selected_El);
-						pass_veto_mu = Pass_SR_Veto_Muon(leptonInfo,idx_Selected_El);
+						pass_veto_el = Pass_CR_Veto_Electron(leptonInfo,idx_Selected_El,evtInfo);
+						pass_veto_mu = Pass_CR_Veto_Muon(leptonInfo,idx_Selected_El);
 					}
 				}
 				else
@@ -351,7 +360,7 @@ int main(int argc,char* argv[])
 
 					//Do the b-jets-selected
 					//in Control region , the selected b jets number is 0 ,and even by loose b-jet criteria
-					bool pass_sel_b = Pass_SR_bjets(jetInfo,sel_jets, sel_b_jets);
+					bool pass_sel_b = Pass_CR_bjets(jetInfo,sel_jets, sel_b_jets);
 					if( !pass_sel_b )	
 					{	continue;	}
 
@@ -362,8 +371,20 @@ int main(int argc,char* argv[])
 						//do the b-tag reweighting
 						
 						bmgr.Reset_idx_capacity();
-						bmgr.Set_b_tagged_jets_idx( sel_b_jets );
-						bmgr.Set_b_ntagged_jets_idx( sel_jets );
+						vector<int> tmp_all_jets;
+
+						for(int h=0;h<(int)sel_jets.size();h++)
+						{
+							tmp_all_jets.push_back( sel_jets.at(h) );
+						}
+						for(int h=0;h<(int)sel_b_jets.size();h++)
+						{
+							tmp_all_jets.push_back( sel_b_jets.at(h) );
+						}
+
+						bmgr.Set_b_ntagged_jets_idx( tmp_all_jets );
+						vector<int> tmp_empty_vec;
+						bmgr.Set_b_tagged_jets_idx( tmp_empty_vec );
 						btag_weight = bmgr.Get_Btag_Weight();
 						weight *= btag_weight;
 
@@ -396,33 +417,17 @@ int main(int argc,char* argv[])
 				double* var = new double[ var_num ];
 				for(int B=0;B<(int)sel_b_jets.size();B++)
 				{
+					int lB = (B == 0) ? 1 : 0 ;
 					for(int J1=0;J1<(int)sel_jets.size();J1++)
 					{
 						for(int J2=J1+1;J2<(int)sel_jets.size();J2++)
 						{
-							int lB = (B == 0) ? 1 : 0 ;
 							int tmp_mva_lepb = sel_b_jets.at(lB);
 							int tmp_mva_hadb = sel_b_jets.at(B);
 							int tmp_mva_j1 = sel_jets.at(J1);
 							int tmp_mva_j2 = sel_jets.at(J2);
 							
-							TLorentzVector p_mva_hadb, p_mva_j1, p_mva_j2;
-
-                			p_mva_hadb.SetPxPyPzE(jetInfo.Px[sel_b_jets.at(B)],jetInfo.Py[sel_b_jets.at(B)],jetInfo.Pz[sel_b_jets.at(B)],jetInfo.Energy[sel_b_jets.at(B)]);
-                			p_mva_j1.SetPxPyPzE(jetInfo.Px[sel_jets[J1]],jetInfo.Py[sel_jets[J1]],jetInfo.Pz[sel_jets[J1]],jetInfo.Energy[sel_jets[J1]]);
-                			p_mva_j2.SetPxPyPzE(jetInfo.Px[sel_jets[J2]],jetInfo.Py[sel_jets[J2]],jetInfo.Pz[sel_jets[J2]],jetInfo.Energy[sel_jets[J2]]);
-							
-							var[0] = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
-							var[1] = ( p_mva_j1 + p_mva_j2 ).M();
-
-							var[2] = ( jetInfo.Pt[tmp_mva_j1] + jetInfo.Pt[tmp_mva_j2] );
-							var[3] = fabs( jetInfo.Eta[tmp_mva_j1] - jetInfo.Eta[tmp_mva_j2] ) ;
-							var[4] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_j1] - jetInfo.Phi[tmp_mva_j2] );
-							
-							var[5] = ( jetInfo.Pt[tmp_mva_lepb] + leptonInfo.Pt[idx_Selected_Lep] );
-							var[6] = fabs( jetInfo.Eta[tmp_mva_lepb] - leptonInfo.Eta[idx_Selected_Lep] ) ;
-							var[7] = TVector2::Phi_mpi_pi( jetInfo.Phi[tmp_mva_lepb] - leptonInfo.Phi[idx_Selected_Lep] );
-
+							mvatool::InputVar( var, jetInfo, leptonInfo, evtInfo, sel_jets, sel_b_jets, idx_Selected_Lep, tmp_mva_hadb, tmp_mva_lepb, tmp_mva_j1, tmp_mva_j2 );
 
 							vector<double> inputValues;
 							for(int in=0;in<var_num;in++ )
@@ -461,7 +466,6 @@ int main(int argc,char* argv[])
 				had_t_mass = ( b1 + j1 + j2 ).M();
 				lep_t_mass = (lepton + b2).M();
 
-
 				ntvar = new double[5];
 				ntvar[0] = max_mva_value;
 				ntvar[1] = had_t_mass;
@@ -470,7 +474,7 @@ int main(int argc,char* argv[])
 				ntvar[4] = (double)k;
 				hists.mvav_mass[channel]->Fill( ntvar );
 				delete [] ntvar;
-
+				
 				if(channel == "mu")
 				{	
 					hists.h_l_mu.at(k)->Fill(lep_t_mass,weight);
@@ -483,7 +487,7 @@ int main(int argc,char* argv[])
 				}
 
 				//mva_value cut
-				if( max_mva_value <= 0.22 )
+				if( max_mva_value <= mva_cut )
 				{	continue;	}
 
 				if(channel == "mu")
@@ -518,12 +522,23 @@ int main(int argc,char* argv[])
 		}		//end of r for-loop
 	}			//end of k for-loop
 
+	//Data-Driven for QCD
+
+	hists.h_QCD_mu_c = Data_Driven(h_data_dd_mu,hists.h_QCD_mu_c);
+	hists.h_QCD_el_c = Data_Driven(h_data_dd_el,hists.h_QCD_el_c);
+	hists.h_l_QCD_mu_c = Data_Driven(h_l_data_dd_mu,hists.h_l_QCD_mu_c);
+	hists.h_l_QCD_el_c = Data_Driven(h_l_data_dd_el,hists.h_l_QCD_el_c);
+
+	hists.h_QCD_mu_c->SetName("h_QCD_mu_c");
+	hists.h_QCD_el_c->SetName("h_QCD_el_c");
+	hists.h_l_QCD_mu_c->SetName("h_l_QCD_mu_c");
+	hists.h_l_QCD_el_c->SetName("h_l_QCD_el_c");
+	
 	//*****Drawing Plotting or Outputting files*****//
 
 	//Save these hists to be a root file
 	
-
-	hists.WriteIn("NT NC 1C 2C");
+	hists.WriteIn("NC 1C 2C NT");
 
 	f_out->Close();
 	delete f_out;

@@ -15,6 +15,8 @@ using namespace std;
 
 int main(int argc,char* argv[])
 {
+	string inv_name = "CR_chi2_inv_191029_1635.root";
+
 	string data_sets_name[7] = {"TT","DY","WJets","VV","ST","QCD","Data"};
 	string d6 = data_sets_name[6] + "_SM";
 	string d7 = data_sets_name[6] + "_SE";
@@ -81,13 +83,17 @@ int main(int argc,char* argv[])
 	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_WJets_0pt2217.root");	//for CR
 	f7->GetObject( "eff_b", eff_b );	f7->GetObject( "eff_c", eff_c );	f7->GetObject( "eff_l", eff_l );
 
-	
+	TH1F* h_data_dd_mu;		TH1F* h_data_dd_el;
+	TH1F* h_l_data_dd_mu;	TH1F* h_l_data_dd_el;
+	string inv_path_name = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/" + inv_name;
+	TFile* f_dd = new TFile( (char*)inv_path_name.c_str() );
+	f_dd->GetObject( "h_Data_mu", h_data_dd_mu );
+	f_dd->GetObject( "h_Data_el", h_data_dd_el );
+	f_dd->GetObject( "h_l_Data_mu", h_l_data_dd_mu );
+	f_dd->GetObject( "h_l_Data_el", h_l_data_dd_el );
+
 	//*****************declare/make some object ( histograms or vector ......etc.)******************//
-
 	
-	Hists hists;
-	hists.OneCutModeON();	
-
 	TH2D* h_chi2min_mass_mu = new TH2D( "h_chi2min_mass_mu","",50,0.,500.,40,0.,200. );
 	TH2D* h_chi2min_mass_el = new TH2D( "h_chi2min_mass_el","",50,0.,500.,40,0.,200. );
 
@@ -143,6 +149,19 @@ int main(int argc,char* argv[])
 
 	files_map[ data_sets_name[6] ] = &files_Data;
 	//**********************Start Analysis***********************//
+	string time_str = "";
+	time_str = get_time_str( minute );
+	string new_file_name = "CR_chi2_all_" + time_str + ".root";
+	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
+	//*****************declare/make some object ( histograms or vector ......etc.)******************//
+	//make histograms
+	Hists hists;
+	hists.NoCutModeON();	
+	hists.OneCutModeON();	
+	hists.TwoCutModeON();	
+
+	double* ntvar;		//for temporally store the ntuple vars
+	hists.NtupleModeON();
 
 	for(int k=0;k<(int)files_map.size();k++)
 	{
@@ -421,17 +440,35 @@ int main(int argc,char* argv[])
                 b1.SetPxPyPzE(jetInfo.Px[sel_b_jets[0]],jetInfo.Py[sel_b_jets[0]],jetInfo.Pz[sel_b_jets[0]],jetInfo.Energy[sel_b_jets[0]]);
                 b2.SetPxPyPzE(jetInfo.Px[sel_b_jets[1]],jetInfo.Py[sel_b_jets[1]],jetInfo.Pz[sel_b_jets[1]],jetInfo.Energy[sel_b_jets[1]]);
 				lepton.SetPxPyPzE(leptonInfo.Px[idx_Selected_Lep],leptonInfo.Py[idx_Selected_Lep],leptonInfo.Pz[idx_Selected_Lep],leptonInfo.Energy[idx_Selected_Lep]);
-				had_t_mass = ( b1 + j1 + j2 ).M();
 				
-				//Apply lep_t_mass Cut here	
-
+				had_t_mass = ( b1 + j1 + j2 ).M();
 				lep_t_mass = (lepton + b2).M();
 					
-				//if( !(lep_t_mass < 150.))
-				//{	continue;	}
-				
+				ntvar = new double[5];
+				ntvar[0] = chi_square_value;			//now chi2 value is stored in the var name "max_mva_value"
+				ntvar[1] = had_t_mass;
+				ntvar[2] = lep_t_mass;
+				ntvar[3] = weight;
+				ntvar[4] = (double)k;
+				hists.mvav_mass[channel]->Fill( ntvar );	//in Hist NtupleMode
+				delete [] ntvar;
 
-				//cout << endl << "had_t_mass : " << had_t_mass ;
+				if(channel == "mu")
+				{	
+					hists.h_l_mu.at(k)->Fill(lep_t_mass,weight);
+					hists.h_mu.at(k)->Fill(had_t_mass,weight);
+				}
+				if(channel == "el")
+				{	
+					hists.h_l_el.at(k)->Fill(lep_t_mass,weight);
+					hists.h_el.at(k)->Fill(had_t_mass,weight);
+				}
+
+				h_chi2min_mass_mu->Fill(had_t_mass,chi_square_value,weight);
+				h_chi2min_mass_el->Fill(had_t_mass,chi_square_value,weight);
+				//min chi2-value cut
+				if( chi_square_value >= 20.  )
+				{	continue;	}
 
 				if(channel == "mu")
 				{	
@@ -444,6 +481,21 @@ int main(int argc,char* argv[])
 					hists.h_el_c.at(k)->Fill(had_t_mass,weight);
 				}
 
+				//leptonic top mass cut 
+				if( !(lep_t_mass < 150.))
+				{	continue;	}
+
+				if(channel == "mu")
+				{	
+					hists.h_l_mu_cc.at(k)->Fill(lep_t_mass,weight);
+					hists.h_mu_cc.at(k)->Fill(had_t_mass,weight);
+				}
+				if(channel == "el")
+				{	
+					hists.h_l_el_cc.at(k)->Fill(lep_t_mass,weight);
+					hists.h_el_cc.at(k)->Fill(had_t_mass,weight);
+				}
+
 			}	//end of entry for-loop	
 			cout << endl << "The end of the file-sets " << Set_name << " " << r+1 << " " << endl;
 			
@@ -454,26 +506,18 @@ int main(int argc,char* argv[])
 
 	//Data-Driven in CR-QCD	
 	
-
-	hists.h_QCD_mu_c = DataDriven("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/CR_chi2_inv_191029_1635.root","h_Data_mu",hists.h_QCD_mu_c);
-	hists.h_QCD_el_c = DataDriven("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/CR_chi2_inv_191029_1635.root","h_Data_el",hists.h_QCD_el_c);
-
-	hists.h_l_QCD_mu_c = DataDriven("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/CR_chi2_inv_191029_1635.root","h_l_Data_mu",hists.h_l_QCD_el_c);
-	hists.h_l_QCD_el_c = DataDriven("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/CR_chi2_inv_191029_1635.root","h_l_Data_el",hists.h_l_QCD_el_c);
-
+	hists.h_QCD_mu_c = Data_Driven(h_data_dd_mu,hists.h_QCD_mu_c);
+	hists.h_QCD_el_c = Data_Driven(h_data_dd_el,hists.h_QCD_el_c);
+	hists.h_l_QCD_mu_c = Data_Driven(h_l_data_dd_mu,hists.h_l_QCD_mu_c);
+	hists.h_l_QCD_el_c = Data_Driven(h_l_data_dd_el,hists.h_l_QCD_el_c);
+	
 	hists.h_QCD_mu_c->SetName("h_QCD_mu_c");
 	hists.h_QCD_el_c->SetName("h_QCD_el_c");
 	hists.h_l_QCD_mu_c->SetName("h_l_QCD_mu_c");
 	hists.h_l_QCD_el_c->SetName("h_l_QCD_el_c");
 	//Save these hists to be a root file
 	
-	string time = "";
-	time = get_time_str( minute );
-	string new_file_name = file_name + time + ".root";
-
-	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
-
-	hists.WriteIn("1C");
+	hists.WriteIn("NT NC 1C 2C");
 
 	h_chi2min_mass_mu->Write();
 	h_chi2min_mass_el->Write();

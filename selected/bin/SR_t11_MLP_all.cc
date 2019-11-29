@@ -1,13 +1,14 @@
 /**************************************************************************************
  *
  *	File Name : SR_t11_MLP_all.cc
- *	Description : use train_13's ANN result with variable mass.
- *	Date : 191106~
+ *	Description : use new hists object to store histagrams.
+ *	Date : 191112~
  *	Author : Chen-Yu Chuang
  *
  ****************************************************************************************/
 #include "TopCPViolation/selected/interface/Comp_DataMC.h"
 #include "/wk_cms2/cychuang/CMSSW_9_4_2/src/wk_mva/train_11/weights/TMVAClassification_MLP.class.C"
+#include "TopCPViolation/selected/interface/Hists.h"
 
 using namespace std;
 
@@ -26,12 +27,6 @@ int main(int argc,char* argv[])
 	Weights_map[data_sets_name[4]] = &w_ST;				Weights_map[data_sets_name[5]] = &w_QCD;
 	get_lumi_weight( Weights_map );
 	cout << "Finish getting lumi-weight" << endl;
-	cout << "w_TT.size()  " << (int)w_TT.size() << endl;
-	cout << "w_DY.size()  " << (int)w_DY.size() << endl;
-	cout << "w_WJets.size()  " << (int)w_WJets.size() << endl;
-	cout << "w_VV.size()  " << (int)w_VV.size() << endl;
-	cout << "w_ST.size()  " << (int)w_ST.size() << endl;
-	cout << "w_QCD.size()  " << (int)w_QCD.size() << endl;
 
 	//*********************About path***********************//
 	
@@ -45,17 +40,10 @@ int main(int argc,char* argv[])
 	Data_Set_Path[d6] = &Data_SM;						Data_Set_Path[d7] = &Data_SE;
 	get_path( Data_Set_Path );
 	cout << "Finish getting Path info." << endl;
-	cout << "TT.size()  " << (int)TT.size() << endl;
-	cout << "DY.size()  " << (int)DY.size() << endl;
-	cout << "WJets.size()  " << (int)WJets.size() << endl;
-	cout << "VV.size()  " << (int)VV.size() << endl;
-	cout << "ST.size()  " << (int)ST.size() << endl;
-	cout << "QCD.size()  " << (int)QCD.size() << endl;
 
 	//*********Offline High level Trigger Dealing**********//
 	
-	vector<int> HLT_MC_mu, HLT_MC_el, HLT_Data_mu, HLT_Data_el;
-	
+	vector<int> HLT_MC_mu, HLT_MC_el, HLT_Data_mu, HLT_Data_el;	
 	Get_HLT_Info( string("MC_mu"), HLT_MC_mu );			Get_HLT_Info( string("MC_el"), HLT_MC_el );
 	Get_HLT_Info( string("Data_mu"), HLT_Data_mu );		Get_HLT_Info( string("Data_el"), HLT_Data_el );
 	
@@ -63,12 +51,10 @@ int main(int argc,char* argv[])
 
 	//insert pileup re-weighting information
 	vector<double> pileupinfo;
-	pileupinfo.assign(76,0.);
-	int PUI_size = 76;
+	pileupinfo.assign(76,0.);		int PUI_size = 76;
 	char path_PU_file[200] = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/pileupweights_69200.csv"; 
 	GetPileUpInfo( path_PU_file , pileupinfo , &PUI_size);
 
-	//insert tight-Muon ID Scale Factors' TH2F*
 	TFile* f1 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/muIDSF.root");
 	TH2F* h_tightMuIDSF;		f1->GetObject("abseta_pt_ratio",h_tightMuIDSF);
 
@@ -78,7 +64,6 @@ int main(int argc,char* argv[])
 	TFile* f3 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/muTrgSF.root");
 	TH2F* h_MuTrgSF;			f3->GetObject("abseta_pt_ratio",h_MuTrgSF);
 
-	//insert tight-Electron ID Scale Factor TH2F*
 	TFile* f4 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/elTightIDSF.root");
 	TH2F* h_tightElIDSF;		f4->GetObject("EGamma_SF2D",h_tightElIDSF);
 
@@ -93,223 +78,6 @@ int main(int argc,char* argv[])
 	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_TTbar_0pt6321.root");
 	f7->GetObject( "eff_b", eff_b );	f7->GetObject( "eff_c", eff_c );	f7->GetObject( "eff_l", eff_l );
 
-	
-	//*****************declare/make some object ( histograms or vector ......etc.)******************//
-
-	int bins_No = 50;
-	double hist_min = 0.;
-	double hist_max = 500.;
-	string x_axis_name = "";
-	string histogram_cons = " ;" + x_axis_name + ";Events(No.)";
-	//double bins_weight = 1./( (hist_max-hist_min)/(double)bins_No );
-
-	//histograms for hadronic top mass
-	//
-	TH1F* h_TT_mu = new TH1F("h_TT_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_TT_el = new TH1F("h_TT_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_DY_mu = new TH1F("h_DY_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_DY_el = new TH1F("h_DY_el","",bins_No,hist_min,hist_max);
-
-	TH1F* h_WJets_mu = new TH1F("h_WJets_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_WJets_el = new TH1F("h_WJets_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_VV_mu = new TH1F("h_VV_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_VV_el = new TH1F("h_VV_el","",bins_No,hist_min,hist_max);
-
-	TH1F* h_ST_mu = new TH1F("h_ST_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_ST_el = new TH1F("h_ST_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_QCD_mu = new TH1F("h_QCD_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_QCD_el = new TH1F("h_QCD_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_Data_mu = new TH1F("h_Data_mu"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	//"(primary title);(X-Axis title);(Y-Axis Title)"
-	TH1F* h_Data_el = new TH1F("h_Data_el"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-
-	vector<TH1F*> h_mu;
-	h_mu.push_back(h_TT_mu);		h_mu.push_back(h_DY_mu);
-	h_mu.push_back(h_WJets_mu);		h_mu.push_back(h_VV_mu);
-	h_mu.push_back(h_ST_mu);		h_mu.push_back(h_QCD_mu);
-	h_mu.push_back(h_Data_mu);
-
-	vector<TH1F*> h_el;
-	h_el.push_back(h_TT_el);		h_el.push_back(h_DY_el);
-	h_el.push_back(h_WJets_el);		h_el.push_back(h_VV_el);
-	h_el.push_back(h_ST_el);		h_el.push_back(h_QCD_el);
-	h_el.push_back(h_Data_el);
-
-	//histograms for leptonic top mass
-	//
-	TH1F* h_l_TT_mu = new TH1F("h_l_TT_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_l_TT_el = new TH1F("h_l_TT_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_DY_mu = new TH1F("h_l_DY_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_l_DY_el = new TH1F("h_l_DY_el","",bins_No,hist_min,hist_max);
-
-	TH1F* h_l_WJets_mu = new TH1F("h_l_WJets_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_l_WJets_el = new TH1F("h_l_WJets_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_VV_mu = new TH1F("h_l_VV_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_l_VV_el = new TH1F("h_l_VV_el","",bins_No,hist_min,hist_max);
-
-	TH1F* h_l_ST_mu = new TH1F("h_l_ST_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_l_ST_el = new TH1F("h_l_ST_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_QCD_mu = new TH1F("h_l_QCD_mu","",bins_No,hist_min,hist_max);
-	TH1F* h_l_QCD_el = new TH1F("h_l_QCD_el","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_Data_mu = new TH1F("h_l_Data_mu"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	TH1F* h_l_Data_el = new TH1F("h_l_Data_el"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-
-	vector<TH1F*> h_l_mu;
-	h_l_mu.push_back(h_l_TT_mu);		h_l_mu.push_back(h_l_DY_mu);
-	h_l_mu.push_back(h_l_WJets_mu);		h_l_mu.push_back(h_l_VV_mu);
-	h_l_mu.push_back(h_l_ST_mu);		h_l_mu.push_back(h_l_QCD_mu);
-	h_l_mu.push_back(h_l_Data_mu);
-	
-	vector<TH1F*> h_l_el;
-	h_l_el.push_back(h_l_TT_el);		h_l_el.push_back(h_l_DY_el);
-	h_l_el.push_back(h_l_WJets_el);		h_l_el.push_back(h_l_VV_el);
-	h_l_el.push_back(h_l_ST_el);		h_l_el.push_back(h_l_QCD_el);
-	h_l_el.push_back(h_l_Data_el);
-
-	//for after mva-value cut
-	TH1F* h_TT_mu_c = new TH1F("h_TT_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_TT_el_c = new TH1F("h_TT_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_DY_mu_c = new TH1F("h_DY_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_DY_el_c = new TH1F("h_DY_el_c","",bins_No,hist_min,hist_max);
-
-	TH1F* h_WJets_mu_c = new TH1F("h_WJets_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_WJets_el_c = new TH1F("h_WJets_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_VV_mu_c = new TH1F("h_VV_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_VV_el_c = new TH1F("h_VV_el_c","",bins_No,hist_min,hist_max);
-
-	TH1F* h_ST_mu_c = new TH1F("h_ST_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_ST_el_c = new TH1F("h_ST_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_QCD_mu_c = new TH1F("h_QCD_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_QCD_el_c = new TH1F("h_QCD_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_Data_mu_c = new TH1F("h_Data_mu_c"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	//"(primary title);(X-Axis title);(Y-Axis Title)"
-	TH1F* h_Data_el_c = new TH1F("h_Data_el_c"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-
-	vector<TH1F*> h_mu_c;
-	h_mu_c.push_back(h_TT_mu_c);		h_mu_c.push_back(h_DY_mu_c);
-	h_mu_c.push_back(h_WJets_mu_c);		h_mu_c.push_back(h_VV_mu_c);
-	h_mu_c.push_back(h_ST_mu_c);		h_mu_c.push_back(h_QCD_mu_c);
-	h_mu_c.push_back(h_Data_mu_c);
-
-	vector<TH1F*> h_el_c;
-	h_el_c.push_back(h_TT_el_c);		h_el_c.push_back(h_DY_el_c);
-	h_el_c.push_back(h_WJets_el_c);		h_el_c.push_back(h_VV_el_c);
-	h_el_c.push_back(h_ST_el_c);		h_el_c.push_back(h_QCD_el_c);
-	h_el_c.push_back(h_Data_el_c);
-
-	TH1F* h_l_TT_mu_c = new TH1F("h_l_TT_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_l_TT_el_c = new TH1F("h_l_TT_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_DY_mu_c = new TH1F("h_l_DY_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_l_DY_el_c = new TH1F("h_l_DY_el_c","",bins_No,hist_min,hist_max);
-
-	TH1F* h_l_WJets_mu_c = new TH1F("h_l_WJets_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_l_WJets_el_c = new TH1F("h_l_WJets_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_VV_mu_c = new TH1F("h_l_VV_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_l_VV_el_c = new TH1F("h_l_VV_el_c","",bins_No,hist_min,hist_max);
-
-	TH1F* h_l_ST_mu_c = new TH1F("h_l_ST_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_l_ST_el_c = new TH1F("h_l_ST_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_QCD_mu_c = new TH1F("h_l_QCD_mu_c","",bins_No,hist_min,hist_max);
-	TH1F* h_l_QCD_el_c = new TH1F("h_l_QCD_el_c","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_Data_mu_c = new TH1F("h_l_Data_mu_c"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	TH1F* h_l_Data_el_c = new TH1F("h_l_Data_el_c"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-
-	vector<TH1F*> h_l_mu_c;
-	h_l_mu_c.push_back(h_l_TT_mu_c);		h_l_mu_c.push_back(h_l_DY_mu_c);
-	h_l_mu_c.push_back(h_l_WJets_mu_c);		h_l_mu_c.push_back(h_l_VV_mu_c);
-	h_l_mu_c.push_back(h_l_ST_mu_c);		h_l_mu_c.push_back(h_l_QCD_mu_c);
-	h_l_mu_c.push_back(h_l_Data_mu_c);
-	
-	vector<TH1F*> h_l_el_c;
-	h_l_el_c.push_back(h_l_TT_el_c);		h_l_el_c.push_back(h_l_DY_el_c);
-	h_l_el_c.push_back(h_l_WJets_el_c);		h_l_el_c.push_back(h_l_VV_el_c);
-	h_l_el_c.push_back(h_l_ST_el_c);		h_l_el_c.push_back(h_l_QCD_el_c);
-	h_l_el_c.push_back(h_l_Data_el_c);
-
-	//for after mva-value cut and leptonic mass cut
-
-	TH1F* h_TT_mu_cc = new TH1F("h_TT_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_TT_el_cc = new TH1F("h_TT_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_DY_mu_cc = new TH1F("h_DY_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_DY_el_cc = new TH1F("h_DY_el_cc","",bins_No,hist_min,hist_max);
-
-	TH1F* h_WJets_mu_cc = new TH1F("h_WJets_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_WJets_el_cc = new TH1F("h_WJets_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_VV_mu_cc = new TH1F("h_VV_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_VV_el_cc = new TH1F("h_VV_el_cc","",bins_No,hist_min,hist_max);
-
-	TH1F* h_ST_mu_cc = new TH1F("h_ST_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_ST_el_cc = new TH1F("h_ST_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_QCD_mu_cc = new TH1F("h_QCD_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_QCD_el_cc = new TH1F("h_QCD_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_Data_mu_cc = new TH1F("h_Data_mu_cc"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	//"(primary title);(X-Axis title);(Y-Axis Title)"
-	TH1F* h_Data_el_cc = new TH1F("h_Data_el_cc"," ;Hadronic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-
-	vector<TH1F*> h_mu_cc;
-	h_mu_cc.push_back(h_TT_mu_cc);		h_mu_cc.push_back(h_DY_mu_cc);
-	h_mu_cc.push_back(h_WJets_mu_cc);		h_mu_cc.push_back(h_VV_mu_cc);
-	h_mu_cc.push_back(h_ST_mu_cc);		h_mu_cc.push_back(h_QCD_mu_cc);
-	h_mu_cc.push_back(h_Data_mu_cc);
-
-	vector<TH1F*> h_el_cc;
-	h_el_cc.push_back(h_TT_el_cc);		h_el_cc.push_back(h_DY_el_cc);
-	h_el_cc.push_back(h_WJets_el_cc);		h_el_cc.push_back(h_VV_el_cc);
-	h_el_cc.push_back(h_ST_el_cc);		h_el_cc.push_back(h_QCD_el_cc);
-	h_el_cc.push_back(h_Data_el_cc);
-
-	TH1F* h_l_TT_mu_cc = new TH1F("h_l_TT_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_l_TT_el_cc = new TH1F("h_l_TT_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_DY_mu_cc = new TH1F("h_l_DY_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_l_DY_el_cc = new TH1F("h_l_DY_el_cc","",bins_No,hist_min,hist_max);
-
-	TH1F* h_l_WJets_mu_cc = new TH1F("h_l_WJets_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_l_WJets_el_cc = new TH1F("h_l_WJets_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_VV_mu_cc = new TH1F("h_l_VV_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_l_VV_el_cc = new TH1F("h_l_VV_el_cc","",bins_No,hist_min,hist_max);
-
-	TH1F* h_l_ST_mu_cc = new TH1F("h_l_ST_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_l_ST_el_cc = new TH1F("h_l_ST_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_QCD_mu_cc = new TH1F("h_l_QCD_mu_cc","",bins_No,hist_min,hist_max);
-	TH1F* h_l_QCD_el_cc = new TH1F("h_l_QCD_el_cc","",bins_No,hist_min,hist_max);
-	
-	TH1F* h_l_Data_mu_cc = new TH1F("h_l_Data_mu_cc"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);	
-	TH1F* h_l_Data_el_cc = new TH1F("h_l_Data_el_cc"," ;Leptonic Top Mass(GeV);Events(No.)",bins_No,hist_min,hist_max);
-
-	vector<TH1F*> h_l_mu_cc;
-	h_l_mu_cc.push_back(h_l_TT_mu_cc);		h_l_mu_cc.push_back(h_l_DY_mu_cc);
-	h_l_mu_cc.push_back(h_l_WJets_mu_cc);		h_l_mu_cc.push_back(h_l_VV_mu_cc);
-	h_l_mu_cc.push_back(h_l_ST_mu_cc);		h_l_mu_cc.push_back(h_l_QCD_mu_cc);
-	h_l_mu_cc.push_back(h_l_Data_mu_cc);
-	
-	vector<TH1F*> h_l_el_cc;
-	h_l_el_cc.push_back(h_l_TT_el_cc);		h_l_el_cc.push_back(h_l_DY_el_cc);
-	h_l_el_cc.push_back(h_l_WJets_el_cc);		h_l_el_cc.push_back(h_l_VV_el_cc);
-	h_l_el_cc.push_back(h_l_ST_el_cc);		h_l_el_cc.push_back(h_l_QCD_el_cc);
-	h_l_el_cc.push_back(h_l_Data_el_cc);
 
 	//**********initial the files and TChain and make the file map and weight map***********//
 
@@ -360,10 +128,30 @@ int main(int argc,char* argv[])
 	vector<string> inputVars;
 	inputVars.push_back( "top_mass" );
 	inputVars.push_back( "w_mass" );
-	
+
 	ReadMLP MyMVA( inputVars );
 
 	//**********************Start Analysis***********************//
+	
+	//**************** open the file we want to store the result **********************************//
+
+	string time_str = "";
+	time_str = get_time_str( minute );
+	string new_file_name = string(argv[0]) +"_" + time_str + ".root";
+
+	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
+	//initialize ntuple must be after the initialization of the TFile
+	
+	//*****************declare/make some object ( histograms or vector ......etc.)******************//
+	//make histograms
+	Hists hists;
+	hists.NoCutModeON();	
+	hists.OneCutModeON();	
+	hists.TwoCutModeON();	
+
+	double* ntvar;		//for temporally store the ntuple vars
+	hists.NtupleModeON();
+	
 
 	for(int k=0;k<(int)files_map.size();k++)
 	{
@@ -383,7 +171,6 @@ int main(int argc,char* argv[])
 			//if( Set_name != "TT" )
 			//{	break;	}
 
-			cout << "At Set " << Set_name << " " << r+1 << "'s start, (h_mu[0], h_TT_mu) = " << h_mu[0] << ", " << h_TT_mu << endl;
 			
 			if(!is_data){
 				if( r >= (int)Data_Set_Path[ Set_name ]->size() )
@@ -600,7 +387,7 @@ int main(int argc,char* argv[])
 				double lep_t_mass = -1.;
 				int mva_hadb = -1, mva_j1 = -1, mva_j2 = -1;
 				int mva_lepb = -1 ;
-				int var_num = 2;
+				int var_num = (int)inputVars.size();
 				double* var = new double[ var_num ];
 				for(int B=0;B<(int)sel_b_jets.size();B++)
 				{
@@ -622,6 +409,7 @@ int main(int argc,char* argv[])
 							
 							var[0] = ( p_mva_j1 + p_mva_j2 + p_mva_hadb ).M();
 							var[1] = ( p_mva_j1 + p_mva_j2 ).M();
+
 
 							vector<double> inputValues;
 							for(int in=0;in<var_num;in++ )
@@ -660,30 +448,40 @@ int main(int argc,char* argv[])
 				had_t_mass = ( b1 + j1 + j2 ).M();
 				lep_t_mass = (lepton + b2).M();
 
+				ntvar = new double[5];
+				ntvar[0] = max_mva_value;
+				ntvar[1] = had_t_mass;
+				ntvar[2] = lep_t_mass;
+				ntvar[3] = weight;
+				ntvar[4] = (double)k;
+				hists.mvav_mass[channel]->Fill( ntvar );
+				delete [] ntvar;
+
+
 				if(channel == "mu")
 				{	
-					h_l_mu.at(k)->Fill(lep_t_mass,weight);
-					h_mu.at(k)->Fill(had_t_mass,weight);
+					hists.h_l_mu.at(k)->Fill(lep_t_mass,weight);
+					hists.h_mu.at(k)->Fill(had_t_mass,weight);
 				}
 				if(channel == "el")
 				{	
-					h_l_el.at(k)->Fill(lep_t_mass,weight);
-					h_el.at(k)->Fill(had_t_mass,weight);
+					hists.h_l_el.at(k)->Fill(lep_t_mass,weight);
+					hists.h_el.at(k)->Fill(had_t_mass,weight);
 				}
 
 				//mva_value cut
-				if( max_mva_value <= 0.16 )
+				if( max_mva_value <= 0.22 )
 				{	continue;	}
 
 				if(channel == "mu")
 				{	
-					h_l_mu_c.at(k)->Fill(lep_t_mass,weight);
-					h_mu_c.at(k)->Fill(had_t_mass,weight);
+					hists.h_l_mu_c.at(k)->Fill(lep_t_mass,weight);
+					hists.h_mu_c.at(k)->Fill(had_t_mass,weight);
 				}
 				if(channel == "el")
 				{	
-					h_l_el_c.at(k)->Fill(lep_t_mass,weight);
-					h_el_c.at(k)->Fill(had_t_mass,weight);
+					hists.h_l_el_c.at(k)->Fill(lep_t_mass,weight);
+					hists.h_el_c.at(k)->Fill(had_t_mass,weight);
 				}
 
 				//leptonic top mass cut 
@@ -692,17 +490,16 @@ int main(int argc,char* argv[])
 
 				if(channel == "mu")
 				{	
-					h_l_mu_cc.at(k)->Fill(lep_t_mass,weight);
-					h_mu_cc.at(k)->Fill(had_t_mass,weight);
+					hists.h_l_mu_cc.at(k)->Fill(lep_t_mass,weight);
+					hists.h_mu_cc.at(k)->Fill(had_t_mass,weight);
 				}
 				if(channel == "el")
 				{	
-					h_l_el_cc.at(k)->Fill(lep_t_mass,weight);
-					h_el_cc.at(k)->Fill(had_t_mass,weight);
+					hists.h_l_el_cc.at(k)->Fill(lep_t_mass,weight);
+					hists.h_el_cc.at(k)->Fill(had_t_mass,weight);
 				}
 
 			}	//end of entry for-loop	
-			//cout << endl << "At Set " << Set_name << " " << r+1 << "'s end, (h_mu[0], h_TT_mu) = " << h_mu[0] << ", " << h_TT_mu << endl;
 			cout << endl << "The end of the file-sets " << Set_name << " " << r+1 << " " << endl;
 			
 		}		//end of r for-loop
@@ -712,118 +509,10 @@ int main(int argc,char* argv[])
 
 	//Save these hists to be a root file
 	
-	string time = "";
-	time = get_time_str( minute );
-	string new_file_name = "SR_t11_MLP_all_" + time + ".root";
 
-	TFile* f_out = new TFile( new_file_name.c_str() , "recreate" );
-
-	h_TT_mu->Write();
-	h_DY_mu->Write();
-	h_WJets_mu->Write();
-	h_VV_mu->Write();
-	h_ST_mu->Write();
-	h_QCD_mu->Write();
-
-	h_TT_el->Write();
-	h_DY_el->Write();
-	h_WJets_el->Write();
-	h_VV_el->Write();
-	h_ST_el->Write();
-	h_QCD_el->Write();
-	
-	h_Data_mu->Write();
-	h_Data_el->Write();
-	
-	h_l_TT_mu->Write();
-	h_l_DY_mu->Write();
-	h_l_WJets_mu->Write();
-	h_l_VV_mu->Write();
-	h_l_ST_mu->Write();
-	h_l_QCD_mu->Write();
-
-	h_l_TT_el->Write();
-	h_l_DY_el->Write();
-	h_l_WJets_el->Write();
-	h_l_VV_el->Write();
-	h_l_ST_el->Write();
-	h_l_QCD_el->Write();
-	
-	h_l_Data_mu->Write();
-	h_l_Data_el->Write();
-
-	//
-	h_TT_mu_c->Write();
-	h_DY_mu_c->Write();
-	h_WJets_mu_c->Write();
-	h_VV_mu_c->Write();
-	h_ST_mu_c->Write();
-	h_QCD_mu_c->Write();
-
-	h_TT_el_c->Write();
-	h_DY_el_c->Write();
-	h_WJets_el_c->Write();
-	h_VV_el_c->Write();
-	h_ST_el_c->Write();
-	h_QCD_el_c->Write();
-	
-	h_Data_mu_c->Write();
-	h_Data_el_c->Write();
-	
-	h_l_TT_mu_c->Write();
-	h_l_DY_mu_c->Write();
-	h_l_WJets_mu_c->Write();
-	h_l_VV_mu_c->Write();
-	h_l_ST_mu_c->Write();
-	h_l_QCD_mu_c->Write();
-
-	h_l_TT_el_c->Write();
-	h_l_DY_el_c->Write();
-	h_l_WJets_el_c->Write();
-	h_l_VV_el_c->Write();
-	h_l_ST_el_c->Write();
-	h_l_QCD_el_c->Write();
-	
-	h_l_Data_mu_c->Write();
-	h_l_Data_el_c->Write();
-
-	//
-	h_TT_mu_cc->Write();
-	h_DY_mu_cc->Write();
-	h_WJets_mu_cc->Write();
-	h_VV_mu_cc->Write();
-	h_ST_mu_cc->Write();
-	h_QCD_mu_cc->Write();
-
-	h_TT_el_cc->Write();
-	h_DY_el_cc->Write();
-	h_WJets_el_cc->Write();
-	h_VV_el_cc->Write();
-	h_ST_el_cc->Write();
-	h_QCD_el_cc->Write();
-	
-	h_Data_mu_cc->Write();
-	h_Data_el_cc->Write();
-	
-	h_l_TT_mu_cc->Write();
-	h_l_DY_mu_cc->Write();
-	h_l_WJets_mu_cc->Write();
-	h_l_VV_mu_cc->Write();
-	h_l_ST_mu_cc->Write();
-	h_l_QCD_mu_cc->Write();
-
-	h_l_TT_el_cc->Write();
-	h_l_DY_el_cc->Write();
-	h_l_WJets_el_cc->Write();
-	h_l_VV_el_cc->Write();
-	h_l_ST_el_cc->Write();
-	h_l_QCD_el_cc->Write();
-	
-	h_l_Data_mu_cc->Write();
-	h_l_Data_el_cc->Write();
+	hists.WriteIn("NT NC 1C 2C");
 
 	f_out->Close();
-	delete f_out;
 
 	//*****make space free*****//
 	

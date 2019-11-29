@@ -1,6 +1,6 @@
 /**************************************************************************************
  *
- *	File Name : store_candidate_tree9.cc
+ *	File Name : store_candidate_tree10.cc
  *	Description : add new variable for mva
  *				  use new selected sample (with the GenMgr.h file instead of prepare_mva.h)! 
  *		{deepCSV}
@@ -146,8 +146,15 @@ int main(int argc,char* argv[])
 	double c_hadwlepton_delPt;
 	double c_hadwlepton_sumPt;
 
+	double c_hadbmet_delPhi;
+	double c_hadbmet_delPt;
+	double c_hadbmet_sumPt;
 
-    //The incoreect combination's memory need to be used many times in one events, and be stored in many events
+	double c_hadwmet_delPhi;
+	double c_hadwmet_delPt;
+	double c_hadwmet_sumPt;
+    
+	//The incoreect combination's memory need to be used many times in one events, and be stored in many events
     double i_evt_weight;
 
 	double i_top_mass;
@@ -187,6 +194,14 @@ int main(int argc,char* argv[])
 	double i_hadwlepton_delPt;
 	double i_hadwlepton_sumPt;
 
+	double i_hadbmet_delPhi;
+	double i_hadbmet_delPt;
+	double i_hadbmet_sumPt;
+
+	double i_hadwmet_delPhi;
+	double i_hadwmet_delPt;
+	double i_hadwmet_sumPt;
+	
 	//Initial the new trees and their branches
     
     TTree* correct = new TTree("correct","");           //for correct combination's info
@@ -230,7 +245,14 @@ int main(int argc,char* argv[])
 	correct->Branch("hadwlepton_delPt",&c_hadwlepton_delPt,"hadwlepton_delPt/D");
 	correct->Branch("hadwlepton_sumPt",&c_hadwlepton_sumPt,"hadwlepton_sumPt/D");
 	correct->Branch("hadwlepton_delR",&c_hadwlepton_delR,"hadwlepton_delR/D");
+
+	correct->Branch("hadbmet_delPhi",&c_hadbmet_delPhi,"hadbmet_delPhi/D");
+	correct->Branch("hadbmet_delPt",&c_hadbmet_delPt,"hadbmet_delPt/D");
+	correct->Branch("hadbmet_sumPt",&c_hadbmet_sumPt,"hadbmet_sumPt/D");
 	
+	correct->Branch("hadwmet_delPhi",&c_hadwmet_delPhi,"hadwmet_delPhi/D");
+	correct->Branch("hadwmet_delPt",&c_hadwmet_delPt,"hadwmet_delPt/D");
+	correct->Branch("hadwmet_sumPt",&c_hadwmet_sumPt,"hadwmet_sumPt/D");
 
     incorrect->Branch("evt_weight",&i_evt_weight,"evt_weight/D"); 
 
@@ -270,6 +292,14 @@ int main(int argc,char* argv[])
 	incorrect->Branch("hadwlepton_delPt",&i_hadwlepton_delPt,"hadwlepton_delPt/D");
 	incorrect->Branch("hadwlepton_sumPt",&i_hadwlepton_sumPt,"hadwlepton_sumPt/D");
 	incorrect->Branch("hadwlepton_delR",&i_hadwlepton_delR,"hadwlepton_delR/D");
+
+	incorrect->Branch("hadbmet_delPhi",&i_hadbmet_delPhi,"hadbmet_delPhi/D");
+	incorrect->Branch("hadbmet_delPt",&i_hadbmet_delPt,"hadbmet_delPt/D");
+	incorrect->Branch("hadbmet_sumPt",&i_hadbmet_sumPt,"hadbmet_sumPt/D");
+	
+	incorrect->Branch("hadwmet_delPhi",&i_hadwmet_delPhi,"hadwmet_delPhi/D");
+	incorrect->Branch("hadwmet_delPt",&i_hadwmet_delPt,"hadwmet_delPt/D");
+	incorrect->Branch("hadwmet_sumPt",&i_hadwmet_sumPt,"hadwmet_sumPt/D");
 
     //
     string channel = "";	//lep is muon or electron
@@ -523,6 +553,14 @@ cout << "test_2" << endl;
 							c_hadwlepton_delPt = p_mva_hadw.Pt() - leptonInfo.Pt[ idx_Selected_Lep ];
 							c_hadwlepton_sumPt = p_mva_hadw.Pt() + leptonInfo.Pt[ idx_Selected_Lep ];
 							c_hadwlepton_delR = delta_R( p_mva_hadw.Eta(), leptonInfo.Eta[ idx_Selected_Lep ], p_mva_hadw.Phi(), leptonInfo.Phi[ idx_Selected_Lep ]);
+							
+							c_hadbmet_delPhi = TVector2::Phi_mpi_pi( jetInfo.Phi[ tmp_mva_hadb ] - evtInfo.PFMETPhi );
+							c_hadbmet_delPt = jetInfo.Pt[ tmp_mva_hadb ] - evtInfo.PFMET;
+							c_hadbmet_sumPt = jetInfo.Pt[ tmp_mva_hadb ] + evtInfo.PFMET;
+
+							c_hadwmet_delPhi = TVector2::Phi_mpi_pi( p_mva_hadw.Phi() - evtInfo.PFMETPhi );
+							c_hadwmet_delPt = p_mva_hadw.Pt() - evtInfo.PFMET;
+							c_hadwmet_sumPt = p_mva_hadw.Pt() + evtInfo.PFMET;
 
 							correct->Fill();
                         }
@@ -586,6 +624,14 @@ cout << "test_2" << endl;
 							i_hadwlepton_delPt = p_mva_hadw.Pt() - leptonInfo.Pt[ idx_Selected_Lep ];
 							i_hadwlepton_sumPt = p_mva_hadw.Pt() + leptonInfo.Pt[ idx_Selected_Lep ];
 							i_hadwlepton_delR = delta_R( p_mva_hadw.Eta(), leptonInfo.Eta[ idx_Selected_Lep ], p_mva_hadw.Phi(), leptonInfo.Phi[ idx_Selected_Lep ]);
+							
+							i_hadbmet_delPhi = TVector2::Phi_mpi_pi( jetInfo.Phi[ tmp_mva_hadb ] - evtInfo.PFMETPhi );
+							i_hadbmet_delPt = jetInfo.Pt[ tmp_mva_hadb ] - evtInfo.PFMET;
+							i_hadbmet_sumPt = jetInfo.Pt[ tmp_mva_hadb ] + evtInfo.PFMET;
+
+							i_hadwmet_delPhi = TVector2::Phi_mpi_pi( p_mva_hadw.Phi() - evtInfo.PFMETPhi );
+							i_hadwmet_delPt = p_mva_hadw.Pt() - evtInfo.PFMET;
+							i_hadwmet_sumPt = p_mva_hadw.Pt() + evtInfo.PFMET;
 
 							incorrect->Fill();
                         }

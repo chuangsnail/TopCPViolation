@@ -11,3 +11,49 @@ cor_mva_el ratio : 0.201536
 Error : 0.000367359
 
 ===========================================================================
+
+File name corbb_t20_10_MLP
+Finish time is : 191126_1455
+mis_sel ratio: 0.574416
+cor_mva ratio : 0.21862
+Error : +-0.000228746
+cor_mva_mu ratio : 0.224502
+Error : +-0.000296132
+cor_mva_el ratio : 0.214126
+Error : +-0.000369428
+
+===========================================================================
+
+File name train20_10
+Finish time is : 191126_1824
+mis_sel ratio: 0.574416
+cor_mva ratio : 0.21862
+Error : +-0.000228746
+cor_mva_mu ratio : 0.224502
+Error : +-0.000296132
+cor_mva_el ratio : 0.214126
+Error : +-0.000369428
+no-match number : 302609
+==============================================================
+File name train20_0-4
+Finish time is : 191128_2225
+mis_sel ratio: 0.574416
+cor_mva ratio : 0.218825
+Error : +-0.000228871
+cor_mva_mu ratio : 0.224753
+Error : +-0.000296325
+cor_mva_el ratio : 0.214265
+Error : +-0.000369562
+no-match number : 302609
+==============================================================
+File name t19_MLP
+Finish time is : 191129_0543
+mis_sel ratio: 0.574416
+cor_mva ratio : 0.220031
+Error : +-0.000229597
+cor_mva_mu ratio : 0.226027
+Error : +-0.000297301
+cor_mva_el ratio : 0.215384
+Error : +-0.000370662
+no-match number : 302609
+==============================================================

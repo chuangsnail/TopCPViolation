@@ -28,7 +28,7 @@ class File
 public:
 	char files_name[400];
 	TChain* ch;
-	
+	string tree_name;	
 	double lumi_weight;
 	
 	File( char* f_name = NULL )
@@ -37,12 +37,14 @@ public:
 		
 		//files_name = f_name;
 
+		tree_name = "root";
+
 		for(int i=0;i<400;i++)
 		{
 			files_name[i] = f_name[i]; 
 		}
 		
-		ch = new TChain( "root" );	//because in bprimekit ntuple, the default TChain name is 'root'
+		ch = new TChain( (char*)tree_name.c_str() );	//because in bprimekit ntuple, the default TChain name is 'root'
 		ch->Add( files_name );
 		
 		lumi_weight = 1. ;
@@ -67,6 +69,11 @@ public:
 	void SetLumiWeight( double w )
 	{
 		lumi_weight = w;
+	}
+
+	void SetTreeName( string& new_tree_name )
+	{
+		tree_name = new_tree_name;	
 	}
 	
 };

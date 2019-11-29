@@ -285,17 +285,38 @@ double BtagManager::Get_Btag_Weight()
 }
 
 //GetName() is in TObject class
+
 TH1F* DataDriven( const string& filename, const string& data_name, TH1F* h_re )
 {
 	double evt_no_re = h_re->Integral(1,(int)h_re->GetXaxis()->GetNbins()+1);
-	TH1F* h_new = new TH1F(h_re->GetName(),"",(int)h_re->GetXaxis()->GetNbins(),(double)h_re->GetXaxis()->GetXmin(),(double)h_re->GetXaxis()->GetXmax());
+	TH1F* h_old = new TH1F(h_re->GetName(),"",(int)h_re->GetXaxis()->GetNbins(),(double)h_re->GetXaxis()->GetXmin(),(double)h_re->GetXaxis()->GetXmax());
 	TFile* f = new TFile( filename.c_str() );
-	f->GetObject( data_name.c_str() , h_new );
+	f->GetObject( data_name.c_str() , h_old );
+	TH1F* h_new = new TH1F( "h_new","", (int)h_re->GetXaxis()->GetNbins(),(double)h_re->GetXaxis()->GetXmin(),(double)h_re->GetXaxis()->GetXmax() );
+
+	h_new = (TH1F*)h_old->Clone();
+
+	f->Close();
 
 	double evt_no_data = h_new->Integral(1,(int)h_new->GetXaxis()->GetNbins()+1);
 	h_new->Scale( evt_no_re/evt_no_data );
 	h_new->SetName( h_re->GetName() );
+	
 	return h_new;
 }
+
+
+TH1F* Data_Driven( TH1F* h_data, TH1F* h_re )
+{
+	double evt_no_re = h_re->Integral(1,(int)h_re->GetXaxis()->GetNbins()+1);
+	double evt_no_data = h_data->Integral(1,h_data->GetXaxis()->GetNbins()+1);
+	TH1F* h_new = new TH1F();
+	*h_new = *h_data;
+	
+	h_new->Scale( evt_no_re/evt_no_data );
+	h_new->SetName( h_re->GetName() );
+	return h_new;
+}
+
 
 
