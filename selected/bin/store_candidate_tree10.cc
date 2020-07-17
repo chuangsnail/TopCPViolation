@@ -309,7 +309,6 @@ int main(int argc,char* argv[])
 	bmgr.Register_Init_Maps();
 	bmgr.Register_Init_TH2( eff_b, eff_c, eff_l );
 
-cout << "test_2" << endl;	
     //prepare gen object
     GenMgr genmgr( &genInfo, &jetInfo, &leptonInfo );
 		
@@ -453,27 +452,6 @@ cout << "test_2" << endl;
         
         int cor_b = -1, cor_j1 = -1, cor_j2 = -1;
         bool is_good_trained_evt = genmgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
-
-
-		//for check selected objects
-
-		for(int l=0;l<(int)sel_jets.size();l++)
-		{
-			if( sel_jets.at(l) == -1 )
-			{
-				cout << "There is something wrong in jets selection! in entry :" << entry << endl;
-				break;
-			}
-		}
-		
-		for(int l=0;l<(int)sel_b_jets.size();l++)
-		{
-			if( sel_b_jets.at(l) == -1 )
-			{
-				cout << "There is something wrong in b-jets selection! in entry :" << entry << endl;
-				break;
-			}
-		}
 
 		/*
 		cout << "cor_b : " << cor_b << endl;

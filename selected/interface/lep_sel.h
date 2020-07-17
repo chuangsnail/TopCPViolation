@@ -74,4 +74,6 @@ bool Pass_presel_Selected_Muon( LeptonInfo& leps,int& index );
 
 bool Pass_presel_Selected_Electron( LeptonInfo& leps, int& index, EvtInfo& evt );
 
+void ElEnergy_Cor( LeptonInfo* leps );
+
 #endif

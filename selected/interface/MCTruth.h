@@ -23,7 +23,7 @@ int Match_Gen(double gen_eta,double gen_phi,GenInfo& gen)
 	{
 		double d_eta = gen_eta - gen.Eta[i];
 		double d_phi  = TVector2::Phi_mpi_pi(gen_phi - gen.Phi[i]);
-		double delta_R_tmp = TMath::Sqrt( d_eta * d_eta - d_phi * d_phi);
+		double delta_R_tmp = TMath::Sqrt( d_eta * d_eta + d_phi * d_phi);
 
 		if( delta_R_tmp < delta_R && delta_R_tmp < 0.4 )
 		{

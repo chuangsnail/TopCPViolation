@@ -25,6 +25,10 @@ bool Pass_Selected_Jet( JetInfo& jet, const int& idx);
 
 bool Pass_SR_Selected_Jets_Case( JetInfo& jets, vector<int>& sel_jets_idx );
 
+bool Pass_Selected_Jet_woE( JetInfo& jet, const int& idx);
+
+bool Pass_SR_Selected_Jets_Case_woE( JetInfo& jets, vector<int>& sel_jets_idx );
+
 //For generally 2 direction of any 2 things 
 double delta_R( const double& eta1, const double& eta2, const double& phi1,const double& phi2 );
 

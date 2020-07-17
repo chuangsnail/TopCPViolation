@@ -33,10 +33,10 @@ int main(int argc, char* argv[])
 	if(option.find("NC") != string::npos)
 	{
 		string filename = string(argv[2]) + "_HadTop";	
-		Plot_Stack( filename, hists.h_mu_c, hists.h_el_c  );
+		Plot_Stack( filename, hists.h_mu, hists.h_el  );
 	
 		string filename2 = string(argv[2]) + "_LepTop";	
-		Plot_Stack( filename2, hists.h_l_mu_c, hists.h_l_el_c  );
+		Plot_Stack( filename2, hists.h_l_mu, hists.h_l_el  );
 	}
 	
 	if(option.find("1C") != string::npos)
@@ -51,10 +51,10 @@ int main(int argc, char* argv[])
 	if(option.find("2C") != string::npos)
 	{
 		string filename = string(argv[2]) + "_HadTop";	
-		Plot_Stack( filename, hists.h_mu_c, hists.h_el_c  );
+		Plot_Stack( filename, hists.h_mu_cc, hists.h_el_cc  );
 	
 		string filename2 = string(argv[2]) + "_LepTop";	
-		Plot_Stack( filename2, hists.h_l_mu_c, hists.h_l_el_c  );
+		Plot_Stack( filename2, hists.h_l_mu_cc, hists.h_l_el_cc  );
 	}
 	
 	if( (option.find("NC") == string::npos) && (option.find("1C") == string::npos) && (option.find("2C") == string::npos) )

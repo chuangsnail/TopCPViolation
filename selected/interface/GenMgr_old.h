@@ -48,70 +48,17 @@ public:
     int GenLepIdx( int idx );       //input the idx in LeptonInfo, get the index in GenInfo, If there is no match , return -1
 	bool Check_Source_Mo( const int& gen_idx, const int& sourc_mo_pdgid );		//find the mother after checking its propagation
 	void PrintInfo();
-	int is_Gen_Jet_Seen( const int& idx );
-	int is_Gen_Lep_Seen( const int& idx );
-	//double delR();
-
-	void DumpPropagateInfo( const int& idx );
-	int GetPropagationEnd( const int& idx );
+	bool is_Gen_Jet_Seen( const int& idx );
+	bool is_Gen_Lep_Seen( const int& idx );
     
     //member & member function for MVA combination choosing
 	bool Find_Correct_HadronicTop( int& cor_b, int& cor_j1, int& cor_j2 );
 
 };
 
-void GenMgr::DumpPropagateInfo( const int& self_idx )
-{
-	if( self_idx == 0 ) { 
-		cout << "end of propagate" << endl;
-		return; 
-	}
-	int pdgid = gen->PdgID[self_idx];
-	cout << "id:" << self_idx << " Eta:" << gen->Eta[self_idx] << " Phi:" << gen->Phi[self_idx] << endl;
-	if( gen->Da1PdgID[self_idx] == pdgid && gen->Da2PdgID[self_idx] == pdgid )
-	{ DumpPropagateInfo( gen->Da1[self_idx] ); }
-	else if( gen->Da1PdgID[self_idx] == pdgid && gen->Da2PdgID[self_idx] != pdgid )
-	{ DumpPropagateInfo( gen->Da1[self_idx] ); }
-	else if( gen->Da1PdgID[self_idx] != pdgid && gen->Da2PdgID[self_idx] == pdgid )
-	{ DumpPropagateInfo( gen->Da2[self_idx] ); }
-	else if( gen->Da1 )
-	{ 
-		cout << "end of propagate" << endl;
-		return;
-	}
-}
-
-int GenMgr::GetPropagationEnd( const int& idx )
-{
-	cout << "now propagate id:" << idx << endl;
-	int pdgid = gen->PdgID[ idx ];
-	if( gen->Da1PdgID[ idx ] == pdgid && gen->Da2PdgID[ idx ] == pdgid )
-	{ 
-		if( gen->Da1[idx] == 0 )
-		{ return idx; }
-		return GetPropagationEnd( gen->Da1[ idx ] );
-	}
-	else if( gen->Da1PdgID[ idx ] == pdgid && gen->Da2PdgID[ idx ] != pdgid )
-	{ 
-		if( gen->Da1[idx] == 0 )
-		{ return idx; }
-		return GetPropagationEnd( gen->Da1[ idx ] ); 
-	}
-	else if( gen->Da1PdgID[ idx ] != pdgid && gen->Da2PdgID[ idx ] == pdgid )
-	{ 
-		if( gen->Da2[idx] == 0 )
-		{ return idx; }
-		return GetPropagationEnd( gen->Da2[ idx ] ); 
-	}
-	else
-	{ return idx; }	
-}
-
-
-int GenMgr::is_Gen_Jet_Seen( const int& idx )	//idx is idx in geninfo
+bool GenMgr::is_Gen_Jet_Seen( const int& idx )
 {
     double delta_R = DBL_MAX;
-	int tmp = -1;		//tmp is idx in JetInfo(jets)
 	for(int i=0;i<jets->Size;i++)
 	{
 		double gen_eta = jets->GenEta[i];
@@ -124,18 +71,15 @@ int GenMgr::is_Gen_Jet_Seen( const int& idx )	//idx is idx in geninfo
         if( delta_R_tmp < delta_R && delta_R_tmp < 0.4 )
         {
             delta_R = delta_R_tmp;
-			tmp = i;
+			return true;
         }
 	}
-	
-	//cout <<"tmp" << tmp << " dR:" << delta_R << endl;
-	return tmp;
+	return false;
 }
 
-int GenMgr::is_Gen_Lep_Seen( const int& idx )
+bool GenMgr::is_Gen_Lep_Seen( const int& idx )
 {
     double delta_R = DBL_MAX;
-	int tmp = -1;
 	for(int i=0;i<leps->Size;i++)
 	{
 		double gen_eta = leps->GenEta[i];
@@ -148,10 +92,10 @@ int GenMgr::is_Gen_Lep_Seen( const int& idx )
         if( delta_R_tmp < delta_R && delta_R_tmp < 0.4 )
         {
             delta_R = delta_R_tmp;
-			tmp = i;
+			return true;
         }
 	}
-	return tmp;
+	return false;
 }
 
 
@@ -325,125 +269,147 @@ void MVAMgr::Get_selected_info( const vector<int>& sel_j, const vector<int>& sel
 }
 
 
-bool
-GenMgr::Find_Correct_HadronicTop( int& cor_b, int& cor_j1, int& cor_j2 )
+bool GenMgr::Find_Correct_HadronicTop( int& cor_b, int& cor_j1, int& cor_j2 )
 {
-	////check if there is a lepton( muon or electron ), can be seen
-	
+	//check if there is a lepton( muon or electron ), can be seen
 	int lepl_no = 0;
-	int lep_idx = -1;		//in Gen
-	
+	int lep_idx = -1;
 	for(int i=0;i<gen->Size;i++)
 	{
-		if( fabs(gen->PdgID[i]) == 11 || fabs(gen->PdgID[i]) == 13 || fabs(gen->PdgID[i]) == 15 )
+		if( fabs(gen->PdgID[i]) == 11 || fabs(gen->PdgID[i]) == 13 )
 		{
 			if( fabs(gen->Mo1PdgID[i]) == 24 || fabs(gen->Mo2PdgID[i]) == 24 )
 			{	
-				if( is_Gen_Lep_Seen( i ) != -1  )
+				if( is_Gen_Lep_Seen( i ) )
 				{
 					lepl_no++;
 					lep_idx = i;
 				}
 			}
 		}
-		//else if(fabs(gen->PdgID[i]) == 15)
-		//{ 
-			//return false; 
-			//lepl_no++;
-			//lep_idx = i;
-		//}
 	}
 	if( lepl_no != 1 )
-	{	
-		return false;	
-	}
-		
+	{	return false;	}	
 
 	double lep_charge;
 	if( gen->PdgID[lep_idx] > 0 )		//charge < 0
-	{ lep_charge = -1.; }
+	{
+		lep_charge = -1.;
+	}
 	else
-	{ lep_charge = 1.; }
+	{
+		lep_charge = 1.;
+	}
    	
-   	////check 2 b-quark exist in gen
+   	//check 2 b-quark can be seen
 
     int real_gen_b = Find_GenParticle( 5, 6 );            //idx in GenInfo
     int real_gen_bbar = Find_GenParticle( -5, -6 );
     
     if( real_gen_b == -1 || real_gen_bbar == -1 )       //that means there are no b or bbar in this selected event
     {   return false;   }
-	
-	////check 2 jets from W exist in gen
 
-	vector<int> hadj;	//in Geninfo
-	hadj.assign( 10, 0 );
+	if( !( is_Gen_Jet_Seen( real_gen_b ) && is_Gen_Jet_Seen( real_gen_bbar ) ) )
+	{	return false;	}
+    
+	//check 2 jets from W can be seen
+
+	vector<int> hadj;
+	hadj.assign(10,0);
+	int hadj_no = 0;
 	hadj.clear();
 
 	int w_pdg = 24;			//for hadronic branch W
 	if( lep_charge > 0 )	//leptonic branch is W-plus
-	{ w_pdg = -24; }
-
-	/*
-	for(int i=0;i<gen->Size;i++)
 	{
-		cout << "idx:" << i << " Selpdg:" << gen->PdgID[i] << " Mo1idx:" << gen->Mo1[i] << " Mo1pdg:" << gen->Mo1PdgID[ i ] << " Mo2idx:" << gen->Mo2[i] << "  Mo2pdg:" << gen->Mo2PdgID[ i ] << endl;
+		w_pdg = -24;	
 	}
-	*/
-
 
 	for(int i=0;i<gen->Size;i++)
 	{
-		if( ( gen->Mo1PdgID[ i ] == w_pdg || gen->Mo2PdgID[ i ] == w_pdg ) )
-		{ 
-			int self_id = gen->PdgID[i];
-			//if( gen->PdgID[i] != w_pdg )
-			if( fabs(self_id) == 1 || fabs(self_id) == 2 || fabs(self_id) == 3 || fabs(self_id) == 4 )
+		if( (  gen->Mo1PdgID[ i ] == w_pdg || gen->Mo2PdgID[ i ] == w_pdg ) )
+		{
+			if( is_Gen_Jet_Seen( i ) )
 			{
-				hadj.push_back( i ); 
+				hadj_no++;
+				hadj.push_back( i );
 			}
 		}
 	}
-	//cout << "hadj.size()" << (int)hadj.size() << endl;
-	if( (int)hadj.size() != 2 )
-	{ return false; }
+	if( hadj_no != 2 )
+	{	return false;	}	
 
-	////check b/bbar can be seen
-	int b_in_jetinfo = is_Gen_Jet_Seen( real_gen_b );
-	int bbar_in_jetinfo = is_Gen_Jet_Seen( real_gen_bbar );
-
-	if( b_in_jetinfo == -1 || bbar_in_jetinfo == -1 ) { return false; }
-    
-		//to inspect which is hdronic b
+	int hadb = -1;
+	//to inspect which is hdronic b
 	if( lep_charge > 0 )	//hadW is W-minus
-	{ cor_b = bbar_in_jetinfo; }
+	{
+		hadb = real_gen_bbar;
+	}
 	else
-	{ cor_b = b_in_jetinfo; }
+	{
+		hadb = real_gen_b;
+	}
 
-	////check j1/j2 can be seen
+	//to find cor_b, cor_j1, cor_j2 , the idces in detector objects
+	
+    double delta_R = DBL_MAX;
+	for(int i=0;i<jets->Size;i++)
+	{
+		double gen_eta = jets->GenEta[i];
+		double gen_phi = jets->GenPhi[i];
+		
+        double d_eta = gen_eta - gen->Eta[ hadb ];
+        double d_phi  = TVector2::Phi_mpi_pi(gen_phi - gen->Phi[ hadb ]);
+        double delta_R_tmp = TMath::Sqrt( d_eta * d_eta + d_phi * d_phi);
+        
+        if( delta_R_tmp < delta_R && delta_R_tmp < 0.4 )
+        {
+            delta_R = delta_R_tmp;
+            cor_b = i;
+        }
+	}
 
-	//cout << "q1's pdg : " << gen->PdgID[ hadj.at(0) ] << endl;	
-	//DumpPropagateInfo( hadj.at(0) );
-	//cout << "q2's pdg : " << gen->PdgID[ hadj.at(1) ] << endl;	
-	//DumpPropagateInfo( hadj.at(1) );
+    delta_R = DBL_MAX;
+	for(int i=0;i<jets->Size;i++)
+	{
+		double gen_eta = jets->GenEta[i];
+		double gen_phi = jets->GenPhi[i];
+		
+        double d_eta = gen_eta - gen->Eta[ hadj.at(0) ];
+        double d_phi  = TVector2::Phi_mpi_pi(gen_phi - gen->Phi[ hadj.at(0) ]);
+        double delta_R_tmp = TMath::Sqrt( d_eta * d_eta + d_phi * d_phi);
+        
+        if( delta_R_tmp < delta_R && delta_R_tmp < 0.4 )
+        {
+            delta_R = delta_R_tmp;
+            cor_j1 = i;
+        }
+	}
 
-	//int final_j1 = GetPropagationEnd( hadj.at(0) );
-	//int final_j2 = GetPropagationEnd( hadj.at(1) );
+    delta_R = DBL_MAX;
+	for(int i=0;i<jets->Size;i++)
+	{
+		double gen_eta = jets->GenEta[i];
+		double gen_phi = jets->GenPhi[i];
+		
+        double d_eta = gen_eta - gen->Eta[ hadj.at(1) ];
+        double d_phi  = TVector2::Phi_mpi_pi(gen_phi - gen->Phi[ hadj.at(1) ]);
+        double delta_R_tmp = TMath::Sqrt( d_eta * d_eta + d_phi * d_phi);
+        
+        if( delta_R_tmp < delta_R && delta_R_tmp < 0.4 )
+        {
+            delta_R = delta_R_tmp;
+            cor_j2 = i;
+        }
+	}
 
-	int final_j1 = hadj.at(0);
-	int final_j2 = hadj.at(1);
+	if( cor_b == -1 || cor_j1 == -1 || cor_j2 == -1 )
+	{
+		cerr << "There is something wrong!" << endl;
+		return false;
+	}
 
-	//cout << "final_j1:" << final_j1 << "  final_j2:" << final_j2 << endl;
 
-	cor_j1 = is_Gen_Jet_Seen( final_j1 );
-	if(cor_j1 == -1) { return false; }
-    
-	cor_j2 = is_Gen_Jet_Seen( final_j2 );
-	if(cor_j2 == -1) { return false; }
-
-	if( cor_j1 == cor_j2 )
-	{ return false; }
-
-	//cout << endl;
     return true;
 }
 

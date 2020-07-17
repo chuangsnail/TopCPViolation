@@ -1,10 +1,9 @@
 /**************************************************************************************
  *
- *	File Name : st_template.cc
- *	Description : add new variable for mva
- *				  use new selected sample (with the GenMgr.h file instead of prepare_mva.h)! 
- *		{deepCSV}
- *	Date : 191105~
+ *	File Name : step_gen.cc
+ *	Description : to test the Hadronictop fn. in GenMgr.h
+ *	
+ *	Date : 191205~
  *	Author : Chen-Yu Chuang
  *
  *	exe {old_file_name with path without .root} {just new_file_name with path without .root } {option}
@@ -13,15 +12,13 @@
  *
  ****************************************************************************************/
 #include "TopCPViolation/selected/interface/Comp_DataMC.h"
-#include "TopCPViolation/selected/interface/GenMgr.h"
+#include "TopCPViolation/selected/interface/GenMgr_test.h"
 #include "TopCPViolation/selected/interface/kinematic_tool.h"
-#include "TopCPViolation/selected/interface/MVAvar.h"
 
 #include <cmath>
 #include "TLorentzVector.h"
 
 using namespace std;
-using namespace mvatool;
 
 int main(int argc,char* argv[])
 {
@@ -39,7 +36,7 @@ int main(int argc,char* argv[])
 	int PUI_size = 76;
 	char path_PU_file[200] = "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/pileupweights_69200.csv"; 
 	GetPileUpInfo( path_PU_file , pileupinfo , &PUI_size);
-/*
+
 	//insert tight-Muon ID Scale Factors' TH2F*
 	TFile* f1 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/muIDSF.root");
 	TH2F* h_tightMuIDSF;		f1->GetObject("abseta_pt_ratio",h_tightMuIDSF);
@@ -60,27 +57,7 @@ int main(int argc,char* argv[])
 	TFile* f6 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/elTrgSF.root");
 	TH2D* h_ElTrgSF;			f6->GetObject("scale_ele32",h_ElTrgSF);
 	//we need to delete the f1~f7 after finising using the objects from them		//so we delete them after selecting
-*/
-
-	TFile* f1 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/old_lep/muIDSF.root");
-	TH2F* h_tightMuIDSF;		f1->GetObject("abseta_pt_ratio",h_tightMuIDSF);
-
-	TFile* f2 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Lep2016/muiso_Run16All.root");
-	TH2D* h_MuISOSF;			f2->GetObject("muiso",h_MuISOSF);
-
-	TFile* f3 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Lep2016/HLT16_mu_SF.root");
-	TH2F* h_MuTrgSF;			f3->GetObject("abseta_pt_ratio",h_MuTrgSF);
-
-	TFile* f4 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/old_lep/elTightIDSF.root");
-	TH2F* h_tightElIDSF;		f4->GetObject("EGamma_SF2D",h_tightElIDSF);
-
-	TFile* f5 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Lep2016/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root");
-	TH2F* h_ElRECOSF;			f5->GetObject("EGamma_SF2D",h_ElRECOSF);
-
-	TFile* f6 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Lep2016/HLT_SF_16.root");
-	TH2D* h_ElTrgSF;			f6->GetObject("abseta_pt_ratio",h_ElTrgSF);
-
-
+	
 	TH2F* eff_b;		TH2F* eff_c;		TH2F* eff_l;
 	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_TTbar_0pt6321.root");
 	f7->GetObject( "eff_b", eff_b );	f7->GetObject( "eff_c", eff_c );	f7->GetObject( "eff_l", eff_l );
@@ -89,7 +66,7 @@ int main(int argc,char* argv[])
 
 	//Register branches
 	
-	TChain* root_old = new TChain( "root" );
+	TChain* root_old = new TChain( "bprimeKit/root" );
 
 	char point_root[10] = ".root";
 	char pre_name[500] = "";
@@ -121,22 +98,6 @@ int main(int argc,char* argv[])
 	int t_entries = root_old->GetEntries();
 	printf("\nAnd the Entries of this data files are : %d\n",t_entries);
 
-
-	//open new file and store new things
-
-	string new_file_name = string( argv[2] ) + ".root";
-	TFile* f_new = new TFile( new_file_name.c_str(), "recreate" );
-
-    //allocate the memory space for branch
-	//Initial the new trees and their branches
-    
-    TTree* correct = new TTree("correct","");           //for correct combination's info
-    TTree* incorrect = new TTree("incorrect","");
-
-	mvatool::StoreMVATree mvatree( correct, incorrect );
-	mvatree.InitBranch();
-
-    //
     string channel = "";	//lep is muon or electron
 
 	//prepare btag object
@@ -150,15 +111,19 @@ int main(int argc,char* argv[])
 	double pass_sel = 0.;
 	double pass_seen = 0.;
 	double pass_sample_sel = 0.;
-	
+
+	TH1F* h_step_gen = new TH1F( "h_step_gen", "", 12, -2, 10 );
+	double all = 0.;
+	double miss = 0.;
+
 	for(int entry=0;entry<(int)t_entries;++entry)
 	{
-		//if( entry >= 3000 )
-		//{	break;	}
+		if( entry >= 10000 )
+		{	break;	}
 
 		//cout << "Entry : " << entry << endl;
 		root_old->GetEntry(entry);
-
+/*
 		double btag_weight = 1.;
 		double weight = 1.;
 
@@ -229,7 +194,6 @@ int main(int argc,char* argv[])
 		
 		if( !is_pass_HLT )
 		{	continue;	}
-				
 
 		//Then ,do the jet-selection here
 		bool pass_sel_jet = Pass_SR_Selected_Jets_Case(jetInfo,sel_jets);
@@ -265,7 +229,7 @@ int main(int argc,char* argv[])
 				//do the lepton scale factor
 				if(idx_Selected_Lep == idx_Selected_Mu){
 					weight = weight * GetLepSF_TH2F( &leptonInfo, h_tightMuIDSF, idx_Selected_Lep );
-					weight = weight * GetLepSF_TH2D( &leptonInfo, h_MuISOSF, idx_Selected_Lep );
+					weight = weight * GetLepSF_TH2F( &leptonInfo, h_MuISOSF, idx_Selected_Lep );
 					weight = weight * GetLepSF_TH2F( &leptonInfo, h_MuTrgSF, idx_Selected_Lep );
 				}
 				else if(idx_Selected_Lep == idx_Selected_El){
@@ -282,34 +246,21 @@ int main(int argc,char* argv[])
 		{	continue;	}
 
 		pass_sel += weight ;
+*/
        
         //use the sel_jets, sel_b_jets, idx_Selected_Lep to find the correct and incorrect combination
-        
+    
+		all++;	
+
         int cor_b = -1, cor_j1 = -1, cor_j2 = -1;
-        bool is_good_trained_evt = genmgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
+        int is_good_trained_evt = genmgr.Find_Correct_HadronicTop( cor_b, cor_j1, cor_j2 );
+
+		h_step_gen->Fill( is_good_trained_evt );
+
+		if( cor_b == -1 || cor_j1 == -1 || cor_j2 == -1 )
+		{	miss++;	}
 
 		//for check selected objects
-
-		for(int l=0;l<(int)sel_jets.size();l++)
-		{
-			if( sel_jets.at(l) == -1 )
-			{
-				cout << "There is something wrong in jets selection! in entry :" << entry << endl;
-				break;
-			}
-		}
-		
-		for(int l=0;l<(int)sel_b_jets.size();l++)
-		{
-			if( sel_b_jets.at(l) == -1 )
-			{
-				cout << "There is something wrong in b-jets selection! in entry :" << entry << endl;
-				break;
-			}
-		}
-
-		//even the good trained events, there would be some case that some objects can be corresponded by gen particle, but the objects is cut by objects selection (for example cut by jet pt...)
-		//so that ( cor_b, cor_j1,cor_j2 ) all are not -1 doesn't mean there must be 1 correct combination in this event
 
 		/*
 		cout << "cor_b : " << cor_b << endl;
@@ -317,57 +268,34 @@ int main(int argc,char* argv[])
 		cout << "cor_j2 : " << cor_j2 << endl;
 		*/
 
+		//if( cor_b == -1 || cor_j1 == -1 || cor_j2 == -1 )
+		//{	continue;	}
 		//use the events which all pass full selection 
 
 		//pass_seen += weight;
-
-            for(int B=0;B<(int)sel_b_jets.size();++B)
-            {
-                for(int J1=0;J1<(int)sel_jets.size();++J1)
-                {
-                    for(int J2=J1+1;J2<(int)sel_jets.size();++J2)
-                    {
-						int lB = (B == 0) ? 1 : 0 ;
-						int tmp_mva_lepb = sel_b_jets.at(lB);
-						int tmp_mva_hadb = sel_b_jets.at(B);
-						int tmp_mva_j1 = sel_jets.at(J1);
-						int tmp_mva_j2 = sel_jets.at(J2);
-
-                        if( ( sel_b_jets.at(B) == cor_b && sel_jets.at(J1) == cor_j1 && sel_jets.at(J2) == cor_j2 ) || ( sel_b_jets.at(B) == cor_b && sel_jets.at(J1) == cor_j2 && sel_jets.at(J2) == cor_j1) )
-                        {
-							mvatree.c_evt_weight = weight;
-							mvatree.SetCorVar( jetInfo, leptonInfo, evtInfo, sel_jets, sel_b_jets, idx_Selected_Lep, tmp_mva_hadb, tmp_mva_lepb, tmp_mva_j1, tmp_mva_j2 );
-
-							mvatree.correct->Fill();
-                        }
-                        else	//incorrect combination
-                        {
-							mvatree.i_evt_weight = weight;
-							mvatree.SetIncorVar( jetInfo, leptonInfo, evtInfo, sel_jets, sel_b_jets, idx_Selected_Lep, tmp_mva_hadb, tmp_mva_lepb, tmp_mva_j1, tmp_mva_j2 );
-
-							mvatree.incorrect->Fill();
-                        }
-                    }
-                }               
-            }               
         				
 	}	//end of entry for-loop	
 			
-	(mvatree.correct)->Write();
-	(mvatree.incorrect)->Write();
-
-	f_new->Close();
 
 	//*****Drawing Plotting or Outputting files*****//
+
+	cout << "Miss ratio:" << miss/all << endl;
+
+	h_step_gen->Draw();
 
 	string time_str = "";
 	time_str = get_time_str( minute );
 
 	cout << "finish time is : " << time_str << endl;
 	//cout << "pass_seen/pass_sel : " << (double)pass_seen/pass_sel << endl;
+	string filename = "step_gen_" + time_str + "_.root";
+	TFile* fn = new TFile( (char*)filename.c_str(), "recreate" );
+	h_step_gen->Write();
+	fn->Close();
 
 	//*****make space free*****//
 	
+	delete h_step_gen;
 
 	delete f7;
 	delete f6;
@@ -376,5 +304,7 @@ int main(int argc,char* argv[])
 	delete f3;
 	delete f2;
 	delete f1;
+
+
 }
 

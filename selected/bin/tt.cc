@@ -28,7 +28,7 @@ int main(int argc,char* argv[])
 	Weights_map[data_sets_name[0]] = &w_TT;				Weights_map[data_sets_name[1]] = &w_DY;
 	Weights_map[data_sets_name[2]] = &w_WJets;			Weights_map[data_sets_name[3]] = &w_VV;
 	Weights_map[data_sets_name[4]] = &w_ST;				Weights_map[data_sets_name[5]] = &w_QCD;
-	get_lumi_weight( Weights_map ,"/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./dbl_pre_sel_data.txt");
+	get_lumi_weight( Weights_map );
 
 	//*********************About path***********************//
 	
@@ -40,7 +40,7 @@ int main(int argc,char* argv[])
 	Data_Set_Path[data_sets_name[2]] = &WJets;			Data_Set_Path[data_sets_name[3]] = &VV;
 	Data_Set_Path[data_sets_name[4]] = &ST;				Data_Set_Path[data_sets_name[5]] = &QCD;
 	Data_Set_Path[d6] = &Data_SM;				Data_Set_Path[d7] = &Data_SE;
-	get_path( Data_Set_Path ,"/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/selected/info./dbl_pre_sel_data.txt");
+	get_path( Data_Set_Path );
 
 	//*********Offline High level Trigger Dealing**********//
 	
@@ -281,13 +281,11 @@ int main(int argc,char* argv[])
 				{
 					if(pass_sel_mu)
 					{
-						cout << "idx_Selected_Mu:" << idx_Selected_Mu << endl;
 						pass_veto_el = Pass_CR_Veto_Electron(leptonInfo,idx_Selected_Mu,evtInfo);
 						pass_veto_mu = Pass_CR_Veto_Muon(leptonInfo,idx_Selected_Mu);
 					}
 					if(pass_sel_el)
 					{
-						cout << "idx_Selected_El:" << idx_Selected_El << endl;
 						pass_veto_el = Pass_CR_Veto_Electron(leptonInfo,idx_Selected_El,evtInfo);
 						pass_veto_mu = Pass_CR_Veto_Muon(leptonInfo,idx_Selected_El);
 					}
@@ -386,16 +384,17 @@ int main(int argc,char* argv[])
 						bmgr.Reset_idx_capacity();
 						vector<int> tmp_all_jets;
 
-						for(int h=0;h<(int)sel_jets.size();h++) {
+						for(int h=0;h<(int)sel_jets.size();h++)
+						{
 							tmp_all_jets.push_back( sel_jets.at(h) );
 						}
-						for(int h=0;h<(int)sel_b_jets.size();h++) {
+						for(int h=0;h<(int)sel_b_jets.size();h++)
+						{
 							tmp_all_jets.push_back( sel_b_jets.at(h) );
 						}
 
 						bmgr.Set_b_ntagged_jets_idx( tmp_all_jets );
 						vector<int> tmp_empty_vec;
-						tmp_empty_vec.clear();
 						bmgr.Set_b_tagged_jets_idx( tmp_empty_vec );
 						btag_weight = bmgr.Get_Btag_Weight();
 						weight *= btag_weight;

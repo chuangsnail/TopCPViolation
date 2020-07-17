@@ -1,12 +1,13 @@
 /*************************************************************************
 *
-*	Filename : pre_sel_args.cc 
+*	Filename : pre_sel_dbl.cc 
 *	Description :
 *		made date : about 2019 January
-*		modified date : 2019 August	( apply Golden Json on real data )
+*		modified date : 20191015
+*
+*		loose the lepton selection
 *		for Legacy version data/MC
 *		
-*		Maybe next time I'll add the trigger on this pre-seletion step 
 *	Author : Chen-Yu Chuang
 *
 *************************************************************************/
@@ -17,6 +18,7 @@
 #include "TopCPViolation/selected/interface/jet_sel.h"
 #include "TopCPViolation/selected/interface/checkEvtTool.h"		//for Golden Json file
 #include "TopCPViolation/selected/interface/reweightMC.h"
+#include "TopCPViolation/selected/interface/trigger.h"
 
 #include "TFile.h"
 #include "TChain.h"
@@ -39,7 +41,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	if(argc != 4 && argc!= 5 )
+	if(argc != 4 && argc != 5 )
 	{
 		printf("\nThis is something Wrong! with the arguments' number!");
 		return 0;
@@ -52,8 +54,7 @@ int main(int argc, char* argv[])
 	{	cout << endl << "This dataset is MC " << endl;	}
 
 
-	//TChain* root = new TChain( "bprimeKit/root" );	//use original file to pre-sel
-	TChain* root = new TChain( "root" );				//use dbl pre-sel file to pre-sel
+	TChain* root = new TChain( "bprimeKit/root" );
     //root->Add("/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_001/bpk_ntuple_*.root");
 
 	//To capture original files' name
@@ -62,7 +63,7 @@ int main(int argc, char* argv[])
 	if( argc == 5 )
 		option = "test";
 
-	char star_point_root[10] = "*.root";
+	char star_point_root[10] = "*.root";						//There is no star!!!!!!!!!!!!!!!!!!
 	char point_root[10] = ".root";	
 	char pre_name[500];
 	strcpy(pre_name,argv[1]);
@@ -71,14 +72,13 @@ int main(int argc, char* argv[])
 		strcat(pre_name,star_point_root);
 	else if( option == "test" )
 		strcat(pre_name,point_root);
-
 	//Ex.pre_name now is "/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_003/bpk_ntuple_*.root"
 	
 	root->Add( pre_name );
 
 	//To make the output files' name
 
-	char path_filename[500] = "/wk_cms2/cychuang/pre_sel_file_2016legacy/";
+	char path_filename[500] = "/wk_cms2/cychuang/";
 	strcat(path_filename,argv[2]);
 	char temp_path_filename[500];
 	strcpy( temp_path_filename, path_filename );
@@ -89,33 +89,22 @@ int main(int argc, char* argv[])
 	jets.Register( root , "JetInfo" );
 	LeptonInfo leps;
 	leps.Register( root , "LepInfo" );
+	VertexInfo vtx;
+	vtx.Register( root , "VertexInfo" );
 
-	/*
-	GenInfo genInfo;
-	genInfo.Register( root );
-	PhotonInfo photonInfo;
-	photonInfo.Register( root , "PhotonInfo" );
-	TrgInfo trgInfo;
-	trgInfo.Register( root , "TrgInfo" );
-	VertexInfo vertexInfo;
-	vertexInfo.Register( root , "VertexInfo" );
-	RunInfo runInfo;
-	runInfo.Register( root , "RunInfo" );
-	*/
 
 	//This is the official Golden json file
-	/*
 	checkEvtTool checkEvt_all;
 	checkEvt_all.addJson( "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt" );
 	checkEvt_all.makeJsonMap();
-	*/
 
 
-	//bool is_data = false;
-	//if( std::stod( std::string( argv[3] ) ) == 1. )
-	//{	is_data = true;	}
+	bool is_data = false;
+	if( std::stod( std::string( argv[3] ) ) == 1. )
+	{	is_data = true;	}
     
 	int pre_sel_No = 0;
+	int pre_sel_No_mu = 0;
 	int not_pass_Golden = 0;
     int total_entries = root->GetEntries();
     int k = 1;
@@ -167,39 +156,38 @@ int main(int argc, char* argv[])
 				r++;
 			}
 
-
 			//apply Golden Jsonfile ( just for data )
-			//have applied at prepreSel step
+
+			if( is_data )
+			{
+				if( !checkEvt_all.isGoodEvt(evts.RunNo,evts.LumiNo) )
+				{
+					not_pass_Golden++;
+					continue;	
+				}
+			}
+			else {}	//usually I input argument with 0 for MC files
+
+			//Pass vertex
+			if( !PassGoodVtx( &vtx ) ) continue;
+
+			//El energy cor
+			if( !is_data )
+			{	ElEnergy_Cor( &leps );	}
+
 
 			//Start pre-selstion
         
         	int idx_Selected_Mu = -1;
         	int idx_Selected_El = -1;
         
-			bool pass_sel_mu = Pass_SR_Selected_Muon(leps,idx_Selected_Mu);
-			bool pass_sel_el = Pass_SR_Selected_Electron(leps,idx_Selected_El);
-			bool pass_veto_el = false;		bool pass_veto_mu = false;
+			bool pass_sel_mu = Pass_presel_Selected_Muon(leps,idx_Selected_Mu);
+			bool pass_sel_el = Pass_presel_Selected_Electron(leps,idx_Selected_El,evts);
 
-			if( (pass_sel_mu||pass_sel_el) && !(pass_sel_mu&&pass_sel_el) )
-			{
-				if(pass_sel_mu)
-				{
-					pass_veto_el = Pass_SR_Veto_Electron( leps, idx_Selected_Mu );
-					pass_veto_mu = Pass_SR_Veto_Muon( leps, idx_Selected_Mu );
-				}
-				if(pass_sel_el)
-				{
-					pass_veto_el = Pass_SR_Veto_Electron( leps, idx_Selected_El );
-					pass_veto_mu = Pass_SR_Veto_Muon( leps, idx_Selected_El );
-				}
-			}
-			else
-			{	continue;	}
-		
-			bool is_mu_channel = pass_sel_mu && pass_veto_mu && pass_veto_el ;
-			bool is_el_channel = pass_sel_el && pass_veto_el && pass_veto_mu ;
+			bool is_mu_channel = pass_sel_mu ;
+			bool is_el_channel = pass_sel_el ;
         
-			vector<int> sel_jets;
+			vector<int> sel_jets;		sel_jets.assign(128,-1);
 		
 			int idx_Selected_Lep = -1;
 			if( is_mu_channel&&!is_el_channel )
@@ -212,29 +200,22 @@ int main(int argc, char* argv[])
 			}
 			else
 			{	continue;	}
-
-			//if we use the dbl pre-sel files to do this pre-sel , then we have done the JER in the dbl-pre-sel (no-ISO version pre-sel)
-/*			
-			if( !is_data )
-			{
-				JERCor( jets );
-			}
-*/
-
-        	bool pass_sel_jet = Pass_SR_Selected_Jets_Case( jets, sel_jets );
+			
+        	bool pass_sel_jet = Pass_SR_Selected_Jets_Case_woE( jets, sel_jets );
 			if( !pass_sel_jet )
 			{	continue;	}
         
 		   	if( idx_Selected_Lep == -1 )
-			{	continue;	}	
-			
-			bool pass_delR = Pass_delR_Jet_Lep( jets, leps, sel_jets, idx_Selected_Lep );
-            if( !pass_delR )
-            {	continue;	}
-            
+			{	continue;	}
+
 			//Now Fill in the pre-selection case		
 			root_new->Fill();
 			pre_sel_No++;
+
+			if( is_mu_channel )
+			{
+				pre_sel_No_mu++;
+			}
             
             if(root_new->GetEntries() == 100000)
             {
@@ -259,8 +240,12 @@ int main(int argc, char* argv[])
 		f_new->Close();
     }   //end of while loop
     
+
+
+
 	printf("\nThe original total events No.: %d",total_entries);
 	printf("\nThe events No. which is not pass GoldenJson : %d",not_pass_Golden);
-	printf("\nThe survived events No. after pre-selection : %d\n",pre_sel_No);
+	printf("\nThe survived events No. after pre-selection : %d",pre_sel_No);
+	printf("\nThe survived events No.(mu) after pre-selection : %d",pre_sel_No_mu);
 
 }

@@ -250,8 +250,8 @@ public:
 	double hist_max1;
 	
 	//for store to calculate Poisson error
-	//chosen -> pass full-sel		
-	//cor -> pass ful-sel and it's correct permutation(combination)
+	//chosen -> 'all': pass full-sel / 'part': pass full-sel and pass gen-matching		
+	//cor -> pass 'all'/'pass' and it's correct permutation(combination)
 	
 	map<string, TH1F*> h_chosen, h_cor;
 	

@@ -26,9 +26,9 @@ using namespace std;
 
 double GetPileUpWeight(EvtInfo* event, const vector<double>&, bool* pass_PU);
 
-double GetLepSF_TH2F(LeptonInfo* ,TH2F* ,const int );
+double GetLepSF_TH2F(LeptonInfo* ,TH2F* ,const int& );
 
-double GetLepSF_TH2D(LeptonInfo* ,TH2D* ,const int );
+double GetLepSF_TH2D(LeptonInfo* ,TH2D* ,const int& );
 
 
 class BtagManager
@@ -62,8 +62,8 @@ public:
 	void Set_b_tagged_jets_idx( vector<int>& sel_b_jets );
 	void Set_b_ntagged_jets_idx( vector<int>& sel_jets );
 
-	double Get_Btag_Scale_Factor( const int );
-	double Get_Btag_Efficiency( const int );		//just for op = Medium
+	double Get_Btag_Scale_Factor( const int& );
+	double Get_Btag_Efficiency( const int& );		//just for op = Medium
 	double Get_Btag_Weight();
 	
 	~BtagManager() 
@@ -99,14 +99,14 @@ double Get_GenMinus_Weight(GenInfo& );
 
 bool Is_Well_Match( JetInfo& jets, const int& idx, const double& res )
 {
-	double deta = jets.Eta[idx] - jets.GenEta[idx];
-	double dphi = TVector2::Phi_mpi_pi( (double)( jets.Phi[idx] - jets.GenPhi[idx] ) );
+	double deta = jets.Eta[idx] - jets.GenJetEta[idx];
+	double dphi = TVector2::Phi_mpi_pi( (double)( jets.Phi[idx] - jets.GenJetPhi[idx] ) );
 	double delR = TMath::Sqrt( deta * deta + dphi * dphi );
 
 	if( delR >= 0.4 / 2. ){
 		return false;
 	}	
-	if( fabs( jets.Pt[idx] - jets.GenPt[idx] ) >= 3 * res * jets.Pt[idx] ){
+	if( fabs( jets.Pt[idx] - jets.GenJetPt[idx] ) >= 3 * res * jets.Pt[idx] ){
 		return false;
 	}
 
@@ -115,7 +115,7 @@ bool Is_Well_Match( JetInfo& jets, const int& idx, const double& res )
 
 double Scale_Case( JetInfo& jets, const int& idx, const double& ressf )
 {
-	const double newpt = std::max( 0.0, jets.GenPt[idx] + ressf * ( jets.Pt[idx] - jets.GenPt[idx] ) );
+	const double newpt = std::max( 0.0, jets.GenJetPt[idx] + ressf * ( jets.Pt[idx] - jets.GenJetPt[idx] ) );
     const double scale = newpt / jets.Pt[idx];
 
 	return scale;

@@ -1,6 +1,6 @@
 /**************************************************************************************
  *
- *	File Name : st_template.cc
+ *	File Name : st_template_part.cc
  *	Description : add new variable for mva
  *				  use new selected sample (with the GenMgr.h file instead of prepare_mva.h)! 
  *		{deepCSV}
@@ -60,8 +60,7 @@ int main(int argc,char* argv[])
 	TFile* f6 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/elTrgSF.root");
 	TH2D* h_ElTrgSF;			f6->GetObject("scale_ele32",h_ElTrgSF);
 	//we need to delete the f1~f7 after finising using the objects from them		//so we delete them after selecting
-*/
-
+*/	
 	TFile* f1 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/old_lep/muIDSF.root");
 	TH2F* h_tightMuIDSF;		f1->GetObject("abseta_pt_ratio",h_tightMuIDSF);
 
@@ -79,7 +78,6 @@ int main(int argc,char* argv[])
 
 	TFile* f6 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Lep2016/HLT_SF_16.root");
 	TH2D* h_ElTrgSF;			f6->GetObject("abseta_pt_ratio",h_ElTrgSF);
-
 
 	TH2F* eff_b;		TH2F* eff_c;		TH2F* eff_l;
 	TFile* f7 = new TFile("/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/beffPlot_TTbar_0pt6321.root");
@@ -321,6 +319,8 @@ int main(int argc,char* argv[])
 
 		//pass_seen += weight;
 
+		if(is_good_trained_evt)
+		{
             for(int B=0;B<(int)sel_b_jets.size();++B)
             {
                 for(int J1=0;J1<(int)sel_jets.size();++J1)
@@ -349,12 +349,14 @@ int main(int argc,char* argv[])
                         }
                     }
                 }               
-            }               
+            }       
+		}		
         				
 	}	//end of entry for-loop	
 			
-	(mvatree.correct)->Write();
-	(mvatree.incorrect)->Write();
+	//(mvatree.correct)->Write();
+	//(mvatree.incorrect)->Write();
+	mvatree.WriteIn();
 
 	f_new->Close();
 

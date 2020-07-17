@@ -45,8 +45,8 @@ public:
 	}
 	
 
-	double GetTH2FBinContent(double _x,double _y);
-	double GetTH2DBinContent(double _x,double _y);
+	double GetTH2FBinContent(const double& _x,const double& _y);
+	double GetTH2DBinContent(const double& _x,const double& _y);
 	
 	~SF_2D() { }
 };

@@ -8,7 +8,6 @@
 *		loose the lepton selection
 *		for Legacy version data/MC
 *		
-*		Maybe next time I'll add the trigger on this pre-seletion step 
 *	Author : Chen-Yu Chuang
 *
 *************************************************************************/
@@ -19,6 +18,7 @@
 #include "TopCPViolation/selected/interface/jet_sel.h"
 #include "TopCPViolation/selected/interface/checkEvtTool.h"		//for Golden Json file
 #include "TopCPViolation/selected/interface/reweightMC.h"
+#include "TopCPViolation/selected/interface/trigger.h"
 
 #include "TFile.h"
 #include "TChain.h"
@@ -41,7 +41,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	if(argc != 4)
+	if(argc != 4 && argc != 5 )
 	{
 		printf("\nThis is something Wrong! with the arguments' number!");
 		return 0;
@@ -59,18 +59,26 @@ int main(int argc, char* argv[])
 
 	//To capture original files' name
 
+	string option = "normal";
+	if( argc == 5 )
+		option = "test";
+
 	char star_point_root[10] = "*.root";						//There is no star!!!!!!!!!!!!!!!!!!
+	char point_root[10] = ".root";	
 	char pre_name[500];
 	strcpy(pre_name,argv[1]);
 	//Ex. pre_name now is "/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_003/bpk_ntuple_"
-	strcat(pre_name,star_point_root);
+	if( option == "normal" )
+		strcat(pre_name,star_point_root);
+	else if( option == "test" )
+		strcat(pre_name,point_root);
 	//Ex.pre_name now is "/wk_cms2/yichen/bpk_ntuple/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/dir_003/bpk_ntuple_*.root"
 	
 	root->Add( pre_name );
 
 	//To make the output files' name
 
-	char path_filename[500] = "/wk_cms2/cychuang/2016legacy_dbl_pre_sel_file/";
+	char path_filename[500] = "/wk_cms2/cychuang/dbl_pre_sel_file_2016legacy/";
 	strcat(path_filename,argv[2]);
 	char temp_path_filename[500];
 	strcpy( temp_path_filename, path_filename );
@@ -81,6 +89,8 @@ int main(int argc, char* argv[])
 	jets.Register( root , "JetInfo" );
 	LeptonInfo leps;
 	leps.Register( root , "LepInfo" );
+	VertexInfo vtx;
+	vtx.Register( root , "VertexInfo" );
 
 	/*
 	GenInfo genInfo;
@@ -89,15 +99,13 @@ int main(int argc, char* argv[])
 	photonInfo.Register( root , "PhotonInfo" );
 	TrgInfo trgInfo;
 	trgInfo.Register( root , "TrgInfo" );
-	VertexInfo vertexInfo;
-	vertexInfo.Register( root , "VertexInfo" );
 	RunInfo runInfo;
 	runInfo.Register( root , "RunInfo" );
 	*/
 
 	//This is the official Golden json file
 	checkEvtTool checkEvt_all;
-	checkEvt_all.addJson( "/wk_cms2/cychuang/CMSSW_8_0_19/src/TopCPViolation/data/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt" );
+	checkEvt_all.addJson( "/wk_cms2/cychuang/CMSSW_9_4_2/src/TopCPViolation/data/Cert_271036-284044_13TeV_ReReco_07Aug2017_Collisions16_JSON.txt" );
 	checkEvt_all.makeJsonMap();
 
 
@@ -106,6 +114,7 @@ int main(int argc, char* argv[])
 	{	is_data = true;	}
     
 	int pre_sel_No = 0;
+	int pre_sel_No_mu = 0;
 	int not_pass_Golden = 0;
     int total_entries = root->GetEntries();
     int k = 1;
@@ -170,6 +179,14 @@ int main(int argc, char* argv[])
 			}
 			else {}	//usually I input argument with 0 for MC files
 
+			//Pass vertex
+			if( !PassGoodVtx( &vtx ) ) continue;
+
+			//El energy cor
+			if( !is_data )
+			{	ElEnergy_Cor( &leps );	}
+
+
 			//Start pre-selstion
         
         	int idx_Selected_Mu = -1;
@@ -202,18 +219,26 @@ int main(int argc, char* argv[])
 		   	if( idx_Selected_Lep == -1 )
 			{	continue;	}
 
+			//JER
 			if( !is_data )
 			{
 				JERCor( jets );
 			}	
-			
+		
+/*	
 			bool pass_delR = Pass_delR_Jet_Lep( jets, leps, sel_jets, idx_Selected_Lep );
             if( !pass_delR )
             {	continue;	}
+*/
             
 			//Now Fill in the pre-selection case		
 			root_new->Fill();
 			pre_sel_No++;
+
+			if( is_mu_channel )
+			{
+				pre_sel_No_mu++;
+			}
             
             if(root_new->GetEntries() == 100000)
             {
@@ -244,5 +269,6 @@ int main(int argc, char* argv[])
 	printf("\nThe original total events No.: %d",total_entries);
 	printf("\nThe events No. which is not pass GoldenJson : %d",not_pass_Golden);
 	printf("\nThe survived events No. after pre-selection : %d",pre_sel_No);
+	printf("\nThe survived events No.(mu) after pre-selection : %d",pre_sel_No_mu);
 
 }
